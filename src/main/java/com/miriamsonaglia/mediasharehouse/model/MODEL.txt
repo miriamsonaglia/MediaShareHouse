@@ -1,0 +1,2 @@
+MODEL
+Contiene le classi che rappresentano DATI ed ENTITA'

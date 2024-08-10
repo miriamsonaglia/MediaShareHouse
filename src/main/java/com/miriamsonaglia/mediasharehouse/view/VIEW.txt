@@ -1,0 +1,2 @@
+VIEW
+Contiene le classi relative all'interfaccia grafica
