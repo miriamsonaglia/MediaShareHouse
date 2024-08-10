@@ -28,7 +28,7 @@ public final class MSHMenu {
         // Definizione dei colori personalizzati
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
-        final ImageIcon imageIcon = new ImageIcon("src/resources/Icon.png");
+        final ImageIcon imageIcon = new ImageIcon("src/main/resources/Icon.png");
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         frame = new JFrame(title);
@@ -38,7 +38,7 @@ public final class MSHMenu {
         frame.setResizable(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        final String imagePath = "src/resources/Background.jpg";
+        final String imagePath = "src/main/resources/Background.jpg";
         loginPanel = createLoginPanel(imagePath, customColor, customColor1);
 
         frame.add(loginPanel);
