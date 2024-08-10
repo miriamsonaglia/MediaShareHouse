@@ -34,6 +34,7 @@
         <version>3.0.0</version>
         <configuration>
           <mainClass>com.miriamsonaglia.mediasharehouse.view.MainApp</mainClass>
+          <!-- <mainClass>com.miriamsonaglia.mediasharehouse.dao.DatabaseCreation</mainClass> -->
         </configuration>
       </plugin>
     </plugins>

@@ -81,19 +81,52 @@ public class DatabaseCreation {
                         + ")"
         };
 
+        String[] dataInsertionQueries = {
+                // Inserimento in Abbonamento
+                "INSERT INTO Abbonamento (tipo, limite_case) VALUES ('base', 1);",
+                "INSERT INTO Abbonamento (tipo, limite_case) VALUES ('premium', 5);",
+                // Inserimento in Utente
+                "INSERT INTO Utente (id_utente, email, password, id_abbonamento) VALUES ('user1', 'user1@example.com', 'password123', 1);",
+                "INSERT INTO Utente (id_utente, email, password, id_abbonamento) VALUES ('user2', 'user2@example.com', 'password456', 2);",
+                // Inserimento in Casa
+                "INSERT INTO Casa (nome, chiave_accesso, stato, id_utente) VALUES ('Casa1', 'accesso123', 'privata', 'user1');",
+                "INSERT INTO Casa (nome, chiave_accesso, stato, id_utente) VALUES ('Casa2', 'accesso456', 'pubblica', 'user2');",
+                // Inserimento in Stanza
+                "INSERT INTO Stanza (tipo, id_casa) VALUES ('music', 1);",
+                "INSERT INTO Stanza (tipo, id_casa) VALUES ('movies', 2);",
+                // Inserimento in Contenuto
+                "INSERT INTO Contenuto (tipo, percorso_file, id_stanza, id_utente) VALUES ('song', '/media/song1.mp3', 1, 'user1');",
+                "INSERT INTO Contenuto (tipo, percorso_file, id_stanza, id_utente) VALUES ('movie', '/media/movie1.mp4', 2, 'user2');",
+                // Inserimento in Commento
+                "INSERT INTO Commento (testo, id_contenuto, id_utente) VALUES ('Great song!', 1, 'user2');",
+                "INSERT INTO Commento (testo, id_contenuto, id_utente, id_commento_padre) VALUES ('Thanks!', 1, 'user1', 1);",
+                // Inserimento in Valutazione
+                "INSERT INTO Valutazione (n_stelle, id_contenuto) VALUES (5, 1);",
+                "INSERT INTO Valutazione (n_stelle, id_contenuto) VALUES (4, 2);"
+        };
+
         try (Connection conn = this.connect()) {
             if (conn != null) {
+                // Creazione tabelle
                 for (String sql : tableCreationQueries) {
                     try (Statement stmt = conn.createStatement()) {
                         stmt.execute(sql);
                     }
                 }
                 System.out.println("Tabelle create con successo.");
+
+                // Inserimento dati
+                for (String sql : dataInsertionQueries) {
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute(sql);
+                    }
+                }
+                System.out.println("Dati inseriti con successo.");
             } else {
-                System.out.println("Connessione non stabilita, tabelle non create.");
+                System.out.println("Connessione non stabilita, tabelle e dati non creati.");
             }
         } catch (SQLException e) {
-            System.out.println("Errore durante la creazione delle tabelle: " + e.getMessage());
+            System.out.println("Errore durante la creazione delle tabelle o l'inserimento dei dati: " + e.getMessage());
         }
     }
 

@@ -19,6 +19,13 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import com.miriamsonaglia.mediasharehouse.dao.DatabaseCreation;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public final class MSHMenu {
 
     private JFrame frame;
@@ -82,14 +89,30 @@ public final class MSHMenu {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
 
-                // Logica di verifica delle credenziali
-                if (username.equals("admin") && password.equals("admin")) {
-                    frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti
-                    new MSHHome(frame, panel, imagePath); // Passa il frame esistente e il pannello corrente
-                    frame.revalidate(); // Aggiorna il layout del frame
-                    frame.repaint(); // Ridisegna il frame
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Username o Password errati.");
+                // Connessione al database e verifica delle credenziali
+                try (Connection connection = new DatabaseCreation().connect()) { // Usa la connessione dal
+                    // DatabaseCreation
+                    String query = "SELECT COUNT(*) FROM Utente WHERE id_utente = ? AND password = ?";
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                        preparedStatement.setString(1, username);
+                        preparedStatement.setString(2, password);
+
+                        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                            if (resultSet.next() && resultSet.getInt(1) > 0) {
+                                // Credenziali valide
+                                frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti
+                                new MSHHome(frame, panel, imagePath); // Passa il frame esistente e il pannello corrente
+                                frame.revalidate(); // Aggiorna il layout del frame
+                                frame.repaint(); // Ridisegna il frame
+                            } else {
+                                // Credenziali non valide
+                                JOptionPane.showMessageDialog(frame, "Username o Password errati.");
+                            }
+                        }
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
                 }
             }
         });
