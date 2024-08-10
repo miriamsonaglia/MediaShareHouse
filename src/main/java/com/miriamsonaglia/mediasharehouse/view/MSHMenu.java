@@ -7,6 +7,10 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -20,11 +24,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseCreation;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public final class MSHMenu {
 
