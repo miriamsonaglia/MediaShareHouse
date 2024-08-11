@@ -96,10 +96,16 @@ public final class RegistrationMenu {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                String username = usernameField.getText();
-                String email = emailField.getText();
-                String password = new String(passwordField.getPassword());
-                String confirmPassword = new String(confirmPasswordField.getPassword());
+                String username = usernameField.getText().trim();
+                String email = emailField.getText().trim();
+                String password = new String(passwordField.getPassword()).trim();
+                String confirmPassword = new String(confirmPasswordField.getPassword()).trim();
+
+                // Controllo che nessun campo sia vuoto
+                if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Tutti i campi sono obbligatori. Riprova.");
+                    return;
+                }
 
                 // Espressione regolare per validare l'email
                 String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
@@ -140,8 +146,7 @@ public final class RegistrationMenu {
                                         JOptionPane.showMessageDialog(frame, "Registrazione completata con successo!");
                                         // Torna al menu principale o passa a un'altra schermata
                                     } else {
-                                        JOptionPane.showMessageDialog(frame,
-                                                "Errore durante la registrazione. Riprova.");
+                                        JOptionPane.showMessageDialog(frame, "Errore durante la registrazione. Riprova.");
                                     }
                                 }
                             }

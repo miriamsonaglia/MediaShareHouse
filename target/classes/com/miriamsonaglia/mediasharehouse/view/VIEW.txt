@@ -1,2 +1,9 @@
 VIEW
 Contiene le classi relative all'interfaccia grafica
+
+CHECK
+RegistrationMenu -> Prova a togliere il suono se cancelli troppo, dà fastidio.
+
+FIX
+MSHHome -> Aggiungi commenti!!!!!!!!!
+           Se creo una casa e pigio back e poi rifaccio il login, la casa non esiste più :')

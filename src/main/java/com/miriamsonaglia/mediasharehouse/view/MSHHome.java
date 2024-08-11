@@ -1,20 +1,35 @@
 package com.miriamsonaglia.mediasharehouse.view;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import com.miriamsonaglia.mediasharehouse.service.HouseManager;
 
 public final class MSHHome {
 
     private JFrame frame;
     private JPanel previousPanel;
+    private static JPanel homePanel;  // Panel principale per la Home
+    private static List<JButton> houseButtons = new ArrayList<>();  // Lista di pulsanti per le case
 
     public MSHHome(JFrame existingFrame, JPanel previousPanel, String imagePath) {
         this.frame = existingFrame;
         this.previousPanel = previousPanel;
 
-        ImagePanel homePanel = createHomePanel(imagePath);
+        homePanel = createHomePanel(imagePath);
 
         frame.add(homePanel);
         frame.revalidate();
@@ -39,7 +54,8 @@ public final class MSHHome {
         newHouseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                // Implementa la logica per aggiungere una casa
+                HouseManager houseManager = new HouseManager(frame);
+                houseManager.createNewHouse();
             }
         });
         panel.add(newHouseButton);
@@ -69,6 +85,25 @@ public final class MSHHome {
         panel.add(exitButton);
 
         return panel;
+    }
+
+    public static void addHouseButtonToPanel(String houseName) {
+        final Color customColor = new Color(218, 165, 32);
+        final Color customColor1 = new Color(101, 67, 33);
+
+        CustomButton houseButton = new CustomButton(houseName, customColor, customColor1, 1);
+        houseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Azione quando il pulsante della casa viene cliccato
+                JOptionPane.showMessageDialog(null, "Hai cliccato su " + houseName);
+            }
+        });
+
+        homePanel.add(houseButton);
+        homePanel.revalidate();
+        homePanel.repaint();
+        houseButtons.add(houseButton);
     }
 
     public void closeWindow() {
