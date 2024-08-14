@@ -1,15 +1,20 @@
 package com.miriamsonaglia.mediasharehouse.service;
 
-import com.miriamsonaglia.mediasharehouse.dao.DatabaseCreation;
-import com.miriamsonaglia.mediasharehouse.view.MSHHome;
-
-import javax.swing.*;
-
-import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import com.miriamsonaglia.mediasharehouse.dao.DatabaseCreation;
+import com.miriamsonaglia.mediasharehouse.view.MSHHome;
 
 public class HouseManager {
 
@@ -46,7 +51,7 @@ public class HouseManager {
                         insertStmt.setString(1, houseName);
                         insertStmt.setString(2, generateUniqueAccessKey()); // Funzione che genera una chiave unica
                         insertStmt.setString(3, houseState);
-                        insertStmt.setString(4, "currentUser");  // Sostituire con l'ID dell'utente corrente
+                        insertStmt.setString(4, "currentUser");
 
                         int rowsInserted = insertStmt.executeUpdate();
                         if (rowsInserted > 0) {
