@@ -25,15 +25,17 @@ import com.miriamsonaglia.mediasharehouse.service.HouseManager;
 
 public final class MSHHome {
 
-    private JFrame frame;
+    private static JFrame frame;
     private JPanel previousPanel;
     private Utente currentUser;
+    private static String imagePath;
     private static JPanel homePanel;  // Panel principale per la Home
 
     public MSHHome(JFrame existingFrame, JPanel previousPanel, String imagePath, Utente currentUser) {
         this.frame = existingFrame;
         this.previousPanel = previousPanel;
         this.currentUser = currentUser;
+        this.imagePath = imagePath;
 
         homePanel = createHomePanel(imagePath);
 
@@ -144,8 +146,11 @@ public final class MSHHome {
         houseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Azione quando il pulsante della casa viene cliccato
-                JOptionPane.showMessageDialog(null, "Hai cliccato su " + houseName);
+            
+                frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti             
+                new Room(frame, homePanel, imagePath); // Passa il frame esistente e il pannello corrente
+                frame.revalidate(); // Aggiorna il layout del frame
+                frame.repaint(); // Ridisegna il 
             }
         });
 
