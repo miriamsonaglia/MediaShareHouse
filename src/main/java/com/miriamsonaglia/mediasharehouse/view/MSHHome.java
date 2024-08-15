@@ -146,7 +146,6 @@ public final class MSHHome {
         houseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            
                 frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti             
                 new Room(frame, homePanel, imagePath); // Passa il frame esistente e il pannello corrente
                 frame.revalidate(); // Aggiorna il layout del frame

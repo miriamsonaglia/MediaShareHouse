@@ -21,11 +21,11 @@ import com.miriamsonaglia.mediasharehouse.view.Room;
 public class RoomManager {
 
     private JFrame frame;
-    private Casa currentCasa;
+    private Casa currentHouse;
 
-    public RoomManager(JFrame frame, Casa currentCasa) {
+    public RoomManager(JFrame frame, Casa currentHouse) {
         this.frame = frame;
-        this.currentCasa = currentCasa;
+        this.currentHouse = currentHouse;
     }
 
     public void createNewRoom() {
@@ -55,7 +55,7 @@ public class RoomManager {
 
                 if (!roomName.isEmpty()) {
                     // Creazione di un nuovo oggetto Stanza
-                    Stanza newStanza = new Stanza(0, roomType, currentCasa.getIdCasa());
+                    Stanza newStanza = new Stanza(0, roomType, currentHouse.getIdCasa());
 
                     // Inserimento nel database tramite StanzaDao
                     boolean isCreated = stanzaDao.createStanza(newStanza);
