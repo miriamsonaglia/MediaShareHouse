@@ -1,3 +1,4 @@
+/*
 package com.miriamsonaglia.mediasharehouse.model;
 
 public class Abbonamento {
@@ -48,3 +49,4 @@ public class Abbonamento {
                 + '}';
     }
 }
+*/

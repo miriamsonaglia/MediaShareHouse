@@ -1,27 +1,28 @@
 package com.miriamsonaglia.mediasharehouse.model;
 
+// import com.sun.org.apache.xpath.internal.operations.Bool;
 public class Utente {
 
-    private String idUtente;
+    private String username;
     private String email;
     private String password;
-    private Abbonamento abbonamento;
+    private int abbonamento;
 
     // Costruttore
-    public Utente(String idUtente, String email, String password, Abbonamento abbonamento) {
-        this.idUtente = idUtente;
+    public Utente(String username, String email, String password, int abbonamento) {
+        this.username = username;
         this.email = email;
         this.password = password;
         this.abbonamento = abbonamento;
     }
 
     // Getter e setter
-    public String getIdUtente() {
-        return idUtente;
+    public String getUsername() {
+        return username;
     }
 
-    public void setIdUtente(String idUtente) {
-        this.idUtente = idUtente;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -40,11 +41,11 @@ public class Utente {
         this.password = password;
     }
 
-    public Abbonamento getAbbonamento() {
+    public int getAbbonamento() {
         return abbonamento;
     }
 
-    public void setAbbonamento(Abbonamento abbonamento) {
+    public void setAbbonamento(int abbonamento) {
         this.abbonamento = abbonamento;
     }
 }

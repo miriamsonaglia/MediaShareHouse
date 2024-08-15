@@ -1,12 +1,11 @@
 package com.miriamsonaglia.mediasharehouse.dao;
 
-import com.miriamsonaglia.mediasharehouse.model.Abbonamento;
-import com.miriamsonaglia.mediasharehouse.model.Utente;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import com.miriamsonaglia.mediasharehouse.model.Utente;
 
 public class UtenteDAO {
 
@@ -17,46 +16,52 @@ public class UtenteDAO {
         this.conn = conn;
     }
 
-    // Metodo per ottenere un utente dal database usando l'id_utente
-    public Utente getUtenteById(String idUtente) {
-        Utente utente = null;
-        String sql = "SELECT u.id_utente, u.email, u.password, a.id_abbonamento, a.tipo, a.limite_case "
-                + "FROM Utente u "
-                + "JOIN Abbonamento a ON u.id_abbonamento = a.id_abbonamento "
-                + "WHERE u.id_utente = ?";
 
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, idUtente);
+    // Metodo per ottenere l'email di un utente dal database usando l'username
+    public String getEmailById(String username) {
+        String email = null; // Email da restituire
+        String sql = "SELECT email FROM Utente WHERE username = ?"; // Query per selezionare l'email usando l'username
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) { // Creazione dello statement
+            pstmt.setString(1, username);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    Abbonamento abbonamento = new Abbonamento(
-                            rs.getInt("id_abbonamento"),
-                            rs.getString("tipo"),
-                            rs.getInt("limite_case")
-                    );
-                    utente = new Utente(
-                            rs.getString("id_utente"),
-                            rs.getString("email"),
-                            rs.getString("password"),
-                            abbonamento
-                    );
+                    email = rs.getString("email");
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Errore durante il recupero dell'utente: " + e.getMessage());
+            System.out.println("Errore durante il recupero dell'email utente: " + e.getMessage());
         }
-        return utente;
+        return email;
     }
+
+    public int getAbbonamentoById(String username) {
+        int abbonamento = 0; // Abbonamento da restituire, di default è 0
+        String sql = "SELECT abbonamento FROM Utente WHERE username = ?"; // Query per selezionare l'email usando l'username
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) { // Creazione dello statement
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    abbonamento = rs.getInt("abbonamento");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Errore durante il recupero dell'abbonamento utente: " + e.getMessage());
+        }
+        return abbonamento;
+    }
+
 
     // Metodo per inserire un nuovo utente nel database
     public boolean insertUtente(Utente utente) {
-        String sql = "INSERT INTO Utente (id_utente, email, password, id_abbonamento) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Utente (username, email, password, abbonamento) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, utente.getIdUtente());
+            pstmt.setString(1, utente.getUsername());
             pstmt.setString(2, utente.getEmail());
             pstmt.setString(3, utente.getPassword());
-            pstmt.setInt(4, utente.getAbbonamento().getIdAbbonamento());
+            pstmt.setInt(4, utente.getAbbonamento());
 
             pstmt.executeUpdate();
             return true;
@@ -68,13 +73,13 @@ public class UtenteDAO {
 
     // Metodo per aggiornare le informazioni di un utente esistente
     public boolean updateUtente(Utente utente) {
-        String sql = "UPDATE Utente SET email = ?, password = ?, id_abbonamento = ? WHERE id_utente = ?";
+        String sql = "UPDATE Utente SET email = ?, password = ?, abbonamento = ? WHERE username = ?";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, utente.getEmail());
             pstmt.setString(2, utente.getPassword());
-            pstmt.setInt(3, utente.getAbbonamento().getIdAbbonamento());
-            pstmt.setString(4, utente.getIdUtente());
+            pstmt.setInt(3, utente.getAbbonamento());
+            pstmt.setString(4, utente.getUsername());
 
             pstmt.executeUpdate();
             return true;
@@ -85,11 +90,11 @@ public class UtenteDAO {
     }
 
     // Metodo per cancellare un utente dal database
-    public boolean deleteUtente(String idUtente) {
-        String sql = "DELETE FROM Utente WHERE id_utente = ?";
+    public boolean deleteUtente(String username) {
+        String sql = "DELETE FROM Utente WHERE username = ?";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, idUtente);
+            pstmt.setString(1, username);
 
             pstmt.executeUpdate();
             return true;

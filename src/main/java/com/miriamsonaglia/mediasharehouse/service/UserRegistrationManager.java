@@ -44,7 +44,7 @@ public class UserRegistrationManager {
 
         try (Connection connection = new DatabaseCreation().connect()) {
             // Verifica se l'username o l'email esistono già
-            String checkQuery = "SELECT COUNT(*) FROM Utente WHERE id_utente = ? OR email = ?";
+            String checkQuery = "SELECT COUNT(*) FROM Utente WHERE username = ? OR email = ?";
             try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
                 checkStmt.setString(1, username);
                 checkStmt.setString(2, email);
@@ -53,12 +53,12 @@ public class UserRegistrationManager {
                         JOptionPane.showMessageDialog(frame, "Username o Email già in uso.");
                     } else {
                         // Se non esistono, inserisci i nuovi dati nel database
-                        String insertQuery = "INSERT INTO Utente (id_utente, email, password, id_abbonamento) VALUES (?, ?, ?, ?)";
+                        String insertQuery = "INSERT INTO Utente (username, email, password, abbonamento) VALUES (?, ?, ?, ?)";
                         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
                             insertStmt.setString(1, username);
                             insertStmt.setString(2, email);
                             insertStmt.setString(3, password);
-                            insertStmt.setInt(4, 1); // Assume l'abbonamento base per i nuovi utenti
+                            insertStmt.setInt(4, 0); // Assume l'abbonamento base per i nuovi utenti
 
                             int rowsInserted = insertStmt.executeUpdate();
                             if (rowsInserted > 0) {

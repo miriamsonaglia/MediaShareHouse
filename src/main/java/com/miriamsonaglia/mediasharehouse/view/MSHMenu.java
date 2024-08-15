@@ -24,6 +24,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseCreation;
+import com.miriamsonaglia.mediasharehouse.dao.UtenteDAO;
+import com.miriamsonaglia.mediasharehouse.model.Utente;
+
+// import sun.security.provider.DSAKeyPairGenerator;
 
 public final class MSHMenu {
 
@@ -91,7 +95,7 @@ public final class MSHMenu {
                 // Connessione al database e verifica delle credenziali
                 try (Connection connection = new DatabaseCreation().connect()) { // Usa la connessione dal
                     // DatabaseCreation
-                    String query = "SELECT COUNT(*) FROM Utente WHERE id_utente = ? AND password = ?";
+                    String query = "SELECT COUNT(*) FROM Utente WHERE username = ? AND password = ?";
                     try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                         preparedStatement.setString(1, username);
                         preparedStatement.setString(2, password);
@@ -100,9 +104,25 @@ public final class MSHMenu {
                             if (resultSet.next() && resultSet.getInt(1) > 0) {
                                 // Credenziali valide
                                 frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti
-                                new MSHHome(frame, panel, imagePath); // Passa il frame esistente e il pannello corrente
+                                
+                                UtenteDAO inizializeUser = new UtenteDAO(connection);
+
+
+                                int abbonamentoCurrentUser = inizializeUser.getAbbonamentoById(username);
+                                String emailCurrentUser = inizializeUser.getEmailById(username);
+
+                                
+                                Utente currentUser = new Utente(username, emailCurrentUser, password, abbonamentoCurrentUser);
+
+                                System.out.println("1" + currentUser.getUsername());
+                                System.out.println("1" + currentUser.getAbbonamento());
+                                System.out.println("1" + currentUser.getEmail());
+                                System.out.println("1" + currentUser.getPassword());
+                                
+                                new MSHHome(frame, panel, imagePath, currentUser); // Passa il frame esistente e il pannello corrente
                                 frame.revalidate(); // Aggiorna il layout del frame
-                                frame.repaint(); // Ridisegna il frame
+                                frame.repaint(); // Ridisegna il 
+
                             } else {
                                 // Credenziali non valide
                                 JOptionPane.showMessageDialog(frame, "Username o Password errati.");
@@ -117,6 +137,8 @@ public final class MSHMenu {
         });
         panel.add(loginButton);
         panel.add(Box.createVerticalStrut(10));
+
+        
 
         // Pulsante SIGN IN
         final CustomButton signInButton = new CustomButton("SIGN IN", customColor, customColor1, 1);
@@ -141,6 +163,8 @@ public final class MSHMenu {
 
         return panel;
     }
+
+
 
     public void closeWindow() {
         frame.setVisible(false);
