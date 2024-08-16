@@ -50,6 +50,7 @@ public class DatabaseCreation {
             + ")",
             "CREATE TABLE IF NOT EXISTS Stanza ("
             + "id_stanza INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + "nome TEXT NOT NULL,"
             + "tipo TEXT CHECK (tipo IN ('music', 'movies', 'books', 'photos')),"
             + "id_casa INTEGER,"
             + "FOREIGN KEY (id_casa) REFERENCES Casa(id_casa)"

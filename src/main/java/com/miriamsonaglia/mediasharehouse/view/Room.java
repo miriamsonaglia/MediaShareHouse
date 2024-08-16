@@ -6,32 +6,49 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import com.miriamsonaglia.mediasharehouse.service.HouseManager;
+import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
+import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
+import com.miriamsonaglia.mediasharehouse.model.Casa;
 import com.miriamsonaglia.mediasharehouse.service.RoomManager;
 
 public final class Room {
     private static JFrame frame;
     private JPanel previousPanel;
     private static JPanel roomPanel;  // Panel principale per la Stanza
+    private Casa currentHouse;
 
-    public Room(JFrame existingFrame, JPanel previousPanel, String imagePath) {
+    public Room(JFrame existingFrame, JPanel previousPanel, String imagePath, int houseId) {
         this.frame = existingFrame;
         this.previousPanel = previousPanel;
+
+        this.currentHouse = fetchHouseById(houseId);
 
         roomPanel = createRoomPanel(imagePath);
 
         frame.add(roomPanel);
         frame.revalidate();
         frame.repaint();
+    }
+
+    private Casa fetchHouseById(int houseId) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            CasaDao casaDao = new CasaDao(connection);
+            return casaDao.getCasaById(houseId);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+            return null;
+        }
     }
 
     private ImagePanel createRoomPanel(String imagePath) {
@@ -52,7 +69,8 @@ public final class Room {
         newRoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                //INSERISCI
+                RoomManager roomManager = new RoomManager(frame, currentHouse);
+                roomManager.createNewRoom();  
             }
         });
         panel.add(newRoomButton);
@@ -88,11 +106,9 @@ public final class Room {
 
     // Metodo per aggiungere un nuovo pulsante per la stanza creata
     public static void addRoomButtonToPanel(String roomName) {
-        JButton roomButton = new JButton(roomName);
-        roomButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        roomButton.setFont(new Font("Monospaced", Font.PLAIN, 20));
-        roomButton.setBackground(new Color(101, 67, 33));
-        roomButton.setForeground(Color.WHITE);
+        final Color customColor = new Color(218, 165, 32);
+        final Color customColor1 = new Color(101, 67, 33);
+        CustomButton roomButton = new CustomButton(roomName, customColor, customColor1, 1);
         
         roomButton.addActionListener(new ActionListener() {
             @Override

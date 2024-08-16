@@ -29,15 +29,11 @@ public class RoomManager {
     }
 
     public void createNewRoom() {
-        // Creazione della connessione al database
         try (Connection connection = DatabaseConnection.getConnection()) {
-
-            // Crea l'oggetto StanzaDao passando la connessione
             StanzaDao stanzaDao = new StanzaDao(connection);
 
-            // Creazione del dialogo per inserire nome e tipo della stanza
             JTextField roomNameField = new JTextField();
-            String[] roomTypes = {"Music", "Film", "Movies", "Books"};
+            String[] roomTypes = {"music", "movies", "books", "photos"};
             JComboBox<String> typeComboBox = new JComboBox<>(roomTypes);
 
             JPanel dialogPanel = new JPanel();
@@ -54,15 +50,12 @@ public class RoomManager {
                 String roomType = (String) typeComboBox.getSelectedItem();
 
                 if (!roomName.isEmpty()) {
-                    // Creazione di un nuovo oggetto Stanza
-                    Stanza newStanza = new Stanza(0, roomType, currentHouse.getIdCasa());
-
-                    // Inserimento nel database tramite StanzaDao
+                    Stanza newStanza = new Stanza(roomName, roomType, currentHouse.getIdCasa());
                     boolean isCreated = stanzaDao.createStanza(newStanza);
 
                     if (isCreated) {
                         JOptionPane.showMessageDialog(frame, "Stanza creata con successo!");
-                        Room.addRoomButtonToPanel(roomName);  // Aggiungi il pulsante della stanza
+                        Room.addRoomButtonToPanel(roomName);
                     } else {
                         JOptionPane.showMessageDialog(frame, "Errore durante la creazione della stanza.");
                     }

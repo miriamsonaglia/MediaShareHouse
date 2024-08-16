@@ -71,7 +71,8 @@ public class HouseManager {
 
                     if (isCreated) {
                         JOptionPane.showMessageDialog(frame, "Casa creata con successo!");
-                        MSHHome.addHouseButtonToPanel(houseName);  // Aggiungi il pulsante della casa
+                        // Passa l'ID della nuova casa al metodo che aggiunge i pulsanti
+                        MSHHome.addHouseButtonToPanel(newCasa.getNome(), newCasa.getIdCasa());
                     } else {
                         JOptionPane.showMessageDialog(frame, "Errore durante la creazione della casa.");
                     }

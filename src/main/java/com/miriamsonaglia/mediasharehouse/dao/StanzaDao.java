@@ -11,7 +11,7 @@ import java.util.List;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 
 public class StanzaDao {
-    
+
     private Connection connection;
 
     // Costruttore che riceve una connessione al database
@@ -21,15 +21,16 @@ public class StanzaDao {
 
     // Metodo per creare una nuova Stanza
     public boolean createStanza(Stanza stanza) {
-        String sql = "INSERT INTO Stanza (tipo, id_casa) VALUES (?, ?)";
+        String sql = "INSERT INTO Stanza (nome, tipo, id_casa) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, stanza.getTipo());
-            pstmt.setInt(2, stanza.getIdCasa());
+            pstmt.setString(1, stanza.getNome());
+            pstmt.setString(2, stanza.getTipo());
+            pstmt.setInt(3, stanza.getIdCasa());
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
                     if (rs.next()) {
-                        stanza.setIdStanza(rs.getInt(1));
+                        stanza.setIdStanza(rs.getInt(1)); // Ottieni l'ID generato dal database
                     }
                 }
                 return true;
@@ -39,6 +40,7 @@ public class StanzaDao {
         }
         return false;
     }
+    
 
     // Metodo per leggere una Stanza dal database tramite il suo ID
     public Stanza getStanzaById(int idStanza) {
@@ -49,6 +51,7 @@ public class StanzaDao {
                 if (rs.next()) {
                     return new Stanza(
                         rs.getInt("id_stanza"),
+                        rs.getString("nome"),
                         rs.getString("tipo"),
                         rs.getInt("id_casa")
                     );
@@ -70,6 +73,7 @@ public class StanzaDao {
                 while (rs.next()) {
                     Stanza stanza = new Stanza(
                         rs.getInt("id_stanza"),
+                        rs.getString("nome"),
                         rs.getString("tipo"),
                         rs.getInt("id_casa")
                     );
@@ -90,6 +94,7 @@ public class StanzaDao {
             while (rs.next()) {
                 Stanza stanza = new Stanza(
                     rs.getInt("id_stanza"),
+                    rs.getString("nome"),
                     rs.getString("tipo"),
                     rs.getInt("id_casa")
                 );
@@ -103,11 +108,12 @@ public class StanzaDao {
 
     // Metodo per aggiornare una Stanza esistente
     public boolean updateStanza(Stanza stanza) {
-        String sql = "UPDATE Stanza SET tipo = ?, id_casa = ? WHERE id_stanza = ?";
+        String sql = "UPDATE Stanza SET nome = ?, tipo = ?, id_casa = ? WHERE id_stanza = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, stanza.getTipo());
-            pstmt.setInt(2, stanza.getIdCasa());
-            pstmt.setInt(3, stanza.getIdStanza());
+            pstmt.setString(1, stanza.getNome());
+            pstmt.setString(2, stanza.getTipo());
+            pstmt.setInt(3, stanza.getIdCasa());
+            pstmt.setInt(4, stanza.getIdStanza());
             int affectedRows = pstmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
@@ -129,4 +135,3 @@ public class StanzaDao {
         return false;
     }
 }
-

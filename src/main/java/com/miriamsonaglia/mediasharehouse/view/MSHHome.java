@@ -138,7 +138,7 @@ public final class MSHHome {
         return panel;
     }
 
-    public static void addHouseButtonToPanel(String houseName) {
+    public static void addHouseButtonToPanel(String houseName, int houseId) {
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
 
@@ -147,7 +147,7 @@ public final class MSHHome {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti             
-                new Room(frame, homePanel, imagePath); // Passa il frame esistente e il pannello corrente
+                new Room(frame, homePanel, imagePath, houseId); // Passa il frame esistente e il pannello corrente
                 frame.revalidate(); // Aggiorna il layout del frame
                 frame.repaint(); // Ridisegna il 
             }
@@ -164,7 +164,7 @@ public final class MSHHome {
             List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
 
             for (Casa casa : userHouses) {
-                addHouseButtonToPanel(casa.getNome());
+                addHouseButtonToPanel(casa.getNome(), casa.getIdCasa());
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
