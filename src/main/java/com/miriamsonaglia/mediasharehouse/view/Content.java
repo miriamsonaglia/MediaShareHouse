@@ -114,23 +114,22 @@ public final class Content {
     }
 
     public static void addContentButtonToPanel(String contentType, String filePath, String name) {
+        System.out.println("Aggiungendo pulsante per il contenuto: " + name);
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
         CustomButton contentButton = new CustomButton(name, customColor, customColor1, 1);
-
+    
         contentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 frame.getContentPane().removeAll();
                 // Azione quando il pulsante del contenuto viene cliccato
                 new ContentViewer(frame, filePath, contentType);
-            
                 frame.revalidate();
                 frame.repaint();
             }
         });
-
+    
         contentPanel.add(contentButton);
         contentPanel.add(Box.createVerticalStrut(10));
         contentPanel.revalidate();
