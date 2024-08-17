@@ -27,7 +27,7 @@ public final class MSHHome {
 
     private static JFrame frame;
     private JPanel previousPanel;
-    private Utente currentUser;
+    private static Utente currentUser;
     private static String imagePath;
     private static JPanel homePanel;  // Panel principale per la Home
 
@@ -147,7 +147,7 @@ public final class MSHHome {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti             
-                new Room(frame, homePanel, imagePath, houseId); // Passa il frame esistente e il pannello corrente
+                new Room(frame, homePanel, imagePath, houseId, currentUser); // Passa il frame esistente e il pannello corrente
                 frame.revalidate(); // Aggiorna il layout del frame
                 frame.repaint(); // Ridisegna il 
             }

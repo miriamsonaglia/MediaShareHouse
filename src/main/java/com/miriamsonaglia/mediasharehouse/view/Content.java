@@ -1,6 +1,5 @@
 package com.miriamsonaglia.mediasharehouse.view;
 
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -17,42 +16,42 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
+import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
-import com.miriamsonaglia.mediasharehouse.model.Casa;
+import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
-import com.miriamsonaglia.mediasharehouse.service.RoomManager;
+import com.miriamsonaglia.mediasharehouse.service.UploadContent;
 
-public final class Room {
+public final class Content {
+
     private static JFrame frame;
     private JPanel previousPanel;
-    private static JPanel roomPanel;  // Panel principale per la Stanza
-    private Casa currentHouse;
-    private static String imagePath;
-    private static Utente currentUser;
+    private static JPanel contentPanel;  // Panel principale per il Contenuto
+    private Stanza currentRoom;
+    private Utente currentUser;
 
-    public Room(JFrame existingFrame, JPanel previousPanel, String imagePath, int houseId, Utente currentUser) {
+    public Content(JFrame existingFrame, JPanel previousPanel, String imagePath, int roomId, Utente currentUser) {
         this.frame = existingFrame;
         this.previousPanel = previousPanel;
-        this.imagePath = imagePath;
+
+        this.currentRoom = fetchRoomById(roomId);
         this.currentUser = currentUser;
 
-        this.currentHouse = fetchHouseById(houseId);
+        contentPanel = createContentPanel(imagePath);
+        loadRoomContent();
 
-        roomPanel = createRoomPanel(imagePath);
-        loadHouseRooms();
-
-        frame.add(roomPanel);
+        frame.add(contentPanel);
         frame.revalidate();
         frame.repaint();
     }
 
-    private Casa fetchHouseById(int houseId) {
+    private Stanza fetchRoomById(int roomId) {
         try (Connection connection = DatabaseConnection.getConnection()) {
-            CasaDao casaDao = new CasaDao(connection);
-            return casaDao.getCasaById(houseId);
+            // Presumendo che tu abbia un Dao simile a StanzaDao per ottenere la stanza
+            StanzaDao stanzaDao = new StanzaDao(connection);
+            return stanzaDao.getStanzaById(roomId);
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
@@ -60,33 +59,35 @@ public final class Room {
         }
     }
 
-    private ImagePanel createRoomPanel(String imagePath) {
+    private ImagePanel createContentPanel(String imagePath) {
         ImagePanel panel = new ImagePanel(imagePath);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
     
-        final JLabel titleLabel = new JLabel("House");   //FAI IN MODO CHE LEGGA IL NOME DELLA CASA SELEZIONATA
+        final JLabel titleLabel = new JLabel(currentRoom.getTipo() + " Room");   // Legge il tipo della stanza selezionata
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleLabel.setFont(new Font("Monospaced", Font.BOLD, 40));
         titleLabel.setForeground(Color.PINK);
         panel.add(titleLabel);
         panel.add(Box.createVerticalStrut(20));
 
-        final CustomButton newRoomButton = new CustomButton("ADD A ROOM", customColor, customColor1, 1);
-        newRoomButton.addActionListener(new ActionListener() {
+        // Pulsante per aggiungere un nuovo contenuto nella stanza
+        final CustomButton newContentButton = new CustomButton("ADD CONTENT", customColor, customColor1, 1);
+        newContentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                RoomManager roomManager = new RoomManager(frame, currentHouse);
-                roomManager.createNewRoom();  
+                
+                UploadContent uploadContent = new UploadContent(frame, currentRoom, currentUser);
+                uploadContent.uploadFile();
+
             }
         });
-        panel.add(newRoomButton);
+        panel.add(newContentButton);
         panel.add(Box.createVerticalStrut(10));
 
-
-        // Pulsante per tornare al menu principale
+        // Pulsante per tornare al menu precedente
         final CustomButton backButton = new CustomButton("BACK", customColor, customColor1, 1);
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -110,55 +111,48 @@ public final class Room {
         panel.add(exitButton);
 
         return panel;
-
     }
 
-    // Metodo per aggiungere un nuovo pulsante per la stanza creata
-    public static void addRoomButtonToPanel(String roomName, int roomId) {
-        final Color customColor = new Color(218, 165, 32);
-        final Color customColor1 = new Color(101, 67, 33);
-        CustomButton roomButton = new CustomButton(roomName, customColor, customColor1, 1);
-        
-        roomButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Get the selected room name
-
-                System.out.println("ID Stanza selezionata: " + roomId);
-                frame.getContentPane().removeAll();
-                new Content(frame, roomPanel, imagePath, roomId, currentUser);
-                frame.revalidate();
-                frame.repaint();
-                // roomManager.displayRoomContent(selectedRoomName);
-            }
-        });
-
-        roomPanel.add(roomButton);
-        roomPanel.add(Box.createVerticalStrut(10));  // Spaziatura tra i pulsanti
-        roomPanel.revalidate();
-        roomPanel.repaint();
-    }
-
-    private void loadHouseRooms() {
-        System.out.println("Caricamento delle stanze della casa: " + currentHouse.getNome());
+    private void loadRoomContent() {
         try (Connection connection = DatabaseConnection.getConnection()) {
-            StanzaDao stanzaDao = new StanzaDao(connection);
-            List<Stanza> houseRooms = stanzaDao.getStanzeByCasa(currentHouse.getIdCasa());
+            ContenutoDao contenutoDao = new ContenutoDao(connection);
+            List<Contenuto> roomContent = contenutoDao.getContenutiByStanza(currentRoom.getIdStanza());
 
-            for (Stanza stanza : houseRooms) {
-                addRoomButtonToPanel(stanza.getNome(), stanza.getIdStanza());
+            for (Contenuto contenuto : roomContent) {
+                addContentButtonToPanel(contenuto.getTipo(), contenuto.getPercorsoFile(), contenuto.getNome());
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Errore nel caricamento delle stanze della casa.");
+            JOptionPane.showMessageDialog(frame, "Errore nel caricamento del contenuto della stanza.");
         }
     }
 
+    public static void addContentButtonToPanel(String contentType, String filePath, String name) {
+        final Color customColor = new Color(218, 165, 32);
+        final Color customColor1 = new Color(101, 67, 33);
+        CustomButton contentButton = new CustomButton(name, customColor, customColor1, 1);
 
+        contentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                frame.getContentPane().removeAll();
+                // Azione quando il pulsante del contenuto viene cliccato
+                JOptionPane.showMessageDialog(null, "Hai cliccato su " + contentType + " con percorso " + filePath);
+            
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+
+        contentPanel.add(contentButton);
+        contentPanel.add(Box.createVerticalStrut(10));
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
 
     public void closeWindow() {
         frame.setVisible(false);
         frame.dispose();
     }
-
 }

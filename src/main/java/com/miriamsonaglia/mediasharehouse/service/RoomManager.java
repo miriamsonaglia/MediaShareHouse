@@ -33,7 +33,7 @@ public class RoomManager {
             StanzaDao stanzaDao = new StanzaDao(connection);
 
             JTextField roomNameField = new JTextField();
-            String[] roomTypes = {"music", "movies", "books", "photos"};
+            String[] roomTypes = {"Music", "Movies", "Books", "Pictures"};
             JComboBox<String> typeComboBox = new JComboBox<>(roomTypes);
 
             JPanel dialogPanel = new JPanel();
@@ -52,10 +52,12 @@ public class RoomManager {
                 if (!roomName.isEmpty()) {
                     Stanza newStanza = new Stanza(roomName, roomType, currentHouse.getIdCasa());
                     boolean isCreated = stanzaDao.createStanza(newStanza);
+                    int idNewStanza = newStanza.getIdStanza();
+
 
                     if (isCreated) {
                         JOptionPane.showMessageDialog(frame, "Stanza creata con successo!");
-                        Room.addRoomButtonToPanel(roomName);
+                        Room.addRoomButtonToPanel(roomName, idNewStanza);
                     } else {
                         JOptionPane.showMessageDialog(frame, "Errore durante la creazione della stanza.");
                     }
