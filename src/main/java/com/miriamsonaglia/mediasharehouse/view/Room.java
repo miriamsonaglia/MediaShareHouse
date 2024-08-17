@@ -117,24 +117,24 @@ public final class Room {
     public static void addRoomButtonToPanel(String roomName, int roomId) {
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
-        CustomButton roomButton = new CustomButton(roomName, customColor, customColor1, 1);
         
+        CustomButton roomButton = new CustomButton(roomName, customColor, customColor1, 1);
         roomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Get the selected room name
-
+                // Gestisci l'azione del pulsante
                 System.out.println("ID Stanza selezionata: " + roomId);
                 frame.getContentPane().removeAll();
                 new Content(frame, roomPanel, imagePath, roomId, currentUser);
                 frame.revalidate();
                 frame.repaint();
-                // roomManager.displayRoomContent(selectedRoomName);
             }
         });
-
+    
         roomPanel.add(roomButton);
         roomPanel.add(Box.createVerticalStrut(10));  // Spaziatura tra i pulsanti
+    
+        // Aggiungi il pannello al frame e aggiorna la visualizzazione
         roomPanel.revalidate();
         roomPanel.repaint();
     }
