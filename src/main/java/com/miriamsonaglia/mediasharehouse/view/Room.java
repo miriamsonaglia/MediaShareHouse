@@ -154,8 +154,6 @@ public final class Room {
         }
     }
 
-
-
     public void closeWindow() {
         frame.setVisible(false);
         frame.dispose();

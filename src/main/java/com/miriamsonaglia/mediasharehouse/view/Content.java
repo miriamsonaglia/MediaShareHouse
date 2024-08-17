@@ -113,6 +113,30 @@ public final class Content {
         return panel;
     }
 
+    public static void addContentButtonToPanel(String contentType, String filePath, String name) {
+        final Color customColor = new Color(218, 165, 32);
+        final Color customColor1 = new Color(101, 67, 33);
+        CustomButton contentButton = new CustomButton(name, customColor, customColor1, 1);
+
+        contentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                frame.getContentPane().removeAll();
+                // Azione quando il pulsante del contenuto viene cliccato
+                new ContentViewer(frame, filePath, contentType);
+            
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+
+        contentPanel.add(contentButton);
+        contentPanel.add(Box.createVerticalStrut(10));
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
     private void loadRoomContent() {
         try (Connection connection = DatabaseConnection.getConnection()) {
             ContenutoDao contenutoDao = new ContenutoDao(connection);
@@ -125,30 +149,6 @@ public final class Content {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(frame, "Errore nel caricamento del contenuto della stanza.");
         }
-    }
-
-    public static void addContentButtonToPanel(String contentType, String filePath, String name) {
-        final Color customColor = new Color(218, 165, 32);
-        final Color customColor1 = new Color(101, 67, 33);
-        CustomButton contentButton = new CustomButton(name, customColor, customColor1, 1);
-
-        contentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                frame.getContentPane().removeAll();
-                // Azione quando il pulsante del contenuto viene cliccato
-                JOptionPane.showMessageDialog(null, "Hai cliccato su " + contentType + " con percorso " + filePath);
-            
-                frame.revalidate();
-                frame.repaint();
-            }
-        });
-
-        contentPanel.add(contentButton);
-        contentPanel.add(Box.createVerticalStrut(10));
-        contentPanel.revalidate();
-        contentPanel.repaint();
     }
 
     public void closeWindow() {
