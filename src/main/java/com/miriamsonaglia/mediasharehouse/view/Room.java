@@ -79,7 +79,7 @@ public final class Room {
         panel.add(titleLabel);
         panel.add(Box.createVerticalStrut(20));
 
-        final CustomButton newRoomButton = new CustomButton("ADD A ROOM", customColor, customColor1, 1);
+        final CustomButton newRoomButton = new CustomButton("AGGIUNGI UNA STANZA", customColor, customColor1, 1);
         newRoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -90,7 +90,7 @@ public final class Room {
         panel.add(newRoomButton);
         panel.add(Box.createVerticalStrut(10));
 
-        final CustomButton deleteButton = new CustomButton("DELETE A ROOM", customColor, customColor1, 1);
+        final CustomButton deleteButton = new CustomButton("ELIMINA UNA STANZA", customColor, customColor1, 1);
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -101,7 +101,7 @@ public final class Room {
         panel.add(Box.createVerticalStrut(10));
 
         // Pulsante per tornare al menu principale
-        final CustomButton backButton = new CustomButton("BACK", customColor, customColor1, 1);
+        final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -114,7 +114,7 @@ public final class Room {
         panel.add(backButton);
         panel.add(Box.createVerticalStrut(10));
 
-        final CustomButton exitButton = new CustomButton("EXIT", customColor, customColor1, 1);
+        final CustomButton exitButton = new CustomButton("ESCI", customColor, customColor1, 1);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -162,7 +162,7 @@ public final class Room {
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
         
-        CustomButton roomButton = new CustomButton(roomName, customColor, customColor1, 1);
+        CustomButton roomButton = new CustomButton(roomName, Color.GREEN, customColor1, 1);
         roomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -175,7 +175,7 @@ public final class Room {
             }
         });
     
-        roomPanel.add(roomButton);
+        roomPanel.add(roomButton, 1);
         roomPanel.add(Box.createVerticalStrut(10));  // Spaziatura tra i pulsanti
     
         // Aggiungi il pannello al frame e aggiorna la visualizzazione

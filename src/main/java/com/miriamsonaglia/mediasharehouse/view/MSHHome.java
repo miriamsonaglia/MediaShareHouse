@@ -66,7 +66,7 @@ public final class MSHHome {
         panel.add(titleLabel);
         panel.add(Box.createVerticalStrut(20));
     
-        final CustomButton newHouseButton = new CustomButton("BUILD A HOUSE", customColor, customColor1, 1);
+        final CustomButton newHouseButton = new CustomButton("CREA UNA CASA", customColor, customColor1, 1);
         newHouseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -116,7 +116,7 @@ public final class MSHHome {
         }
 
 
-        final CustomButton deleteButton = new CustomButton("DELETE A HOUSE", customColor, customColor1, 1);
+        final CustomButton deleteButton = new CustomButton("ELIMINA UNA CASA", customColor, customColor1, 1);
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -127,7 +127,7 @@ public final class MSHHome {
         panel.add(Box.createVerticalStrut(10));
 
         // Pulsante per tornare al menu principale
-        final CustomButton backButton = new CustomButton("BACK", customColor, customColor1, 1);
+        final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -141,7 +141,7 @@ public final class MSHHome {
         panel.add(Box.createVerticalStrut(10));
 
 
-        final CustomButton exitButton = new CustomButton("EXIT", customColor, customColor1, 1);
+        final CustomButton exitButton = new CustomButton("ESCI", customColor, customColor1, 1);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -189,18 +189,19 @@ public final class MSHHome {
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
 
-        CustomButton houseButton = new CustomButton(houseName, customColor, customColor1, 1);
+        CustomButton houseButton = new CustomButton(houseName, Color.GREEN, customColor1, 1);
         houseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti             
                 new Room(frame, homePanel, imagePath, houseId, currentUser); // Passa il frame esistente e il pannello corrente
                 frame.revalidate(); // Aggiorna il layout del frame
-                frame.repaint(); // Ridisegna il 
+                frame.repaint(); // Ridisegna il frame
             }
         });
 
-        homePanel.add(houseButton);
+        homePanel.add(houseButton,1);
+        homePanel.add(Box.createHorizontalStrut(10));
         homePanel.revalidate();
         homePanel.repaint();
         houseButtonMap.put(houseId, houseButton);

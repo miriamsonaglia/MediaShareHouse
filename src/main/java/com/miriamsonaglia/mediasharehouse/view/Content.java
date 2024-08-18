@@ -74,7 +74,7 @@ public final class Content {
         panel.add(Box.createVerticalStrut(20));
 
         // Pulsante per aggiungere un nuovo contenuto nella stanza
-        final CustomButton newContentButton = new CustomButton("ADD CONTENT", customColor, customColor1, 1);
+        final CustomButton newContentButton = new CustomButton("AGGIUNGI UN CONTENUTO", customColor, customColor1, 1);
         newContentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -88,7 +88,7 @@ public final class Content {
         panel.add(Box.createVerticalStrut(10));
 
         // Pulsante per tornare al menu precedente
-        final CustomButton backButton = new CustomButton("BACK", customColor, customColor1, 1);
+        final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -101,7 +101,7 @@ public final class Content {
         panel.add(backButton);
         panel.add(Box.createVerticalStrut(10));
 
-        final CustomButton exitButton = new CustomButton("EXIT", customColor, customColor1, 1);
+        final CustomButton exitButton = new CustomButton("ESCI", customColor, customColor1, 1);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -117,7 +117,7 @@ public final class Content {
         System.out.println("Aggiungendo pulsante per il contenuto: " + name);
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
-        CustomButton contentButton = new CustomButton(name, customColor, customColor1, 1);
+        CustomButton contentButton = new CustomButton(name, Color.GREEN, customColor1, 1);
     
         contentButton.addActionListener(new ActionListener() {
             @Override
@@ -130,7 +130,7 @@ public final class Content {
             }
         });
     
-        contentPanel.add(contentButton);
+        contentPanel.add(contentButton, 1);
         contentPanel.add(Box.createVerticalStrut(10));
         contentPanel.revalidate();
         contentPanel.repaint();

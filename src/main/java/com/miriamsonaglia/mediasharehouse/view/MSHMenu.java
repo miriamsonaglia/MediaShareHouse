@@ -85,7 +85,7 @@ public final class MSHMenu {
         panel.add(Box.createVerticalStrut(20));
 
         // Pulsante LOGIN
-        final CustomButton loginButton = new CustomButton("LOGIN", customColor, customColor1, 1);
+        final CustomButton loginButton = new CustomButton("ACCEDI", customColor, customColor1, 1);
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -141,7 +141,7 @@ public final class MSHMenu {
         
 
         // Pulsante SIGN IN
-        final CustomButton signInButton = new CustomButton("SIGN IN", customColor, customColor1, 1);
+        final CustomButton signInButton = new CustomButton("REGISTRATI", customColor, customColor1, 1);
         signInButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -152,7 +152,7 @@ public final class MSHMenu {
         panel.add(Box.createVerticalStrut(10));
 
         // Pulsante EXIT
-        final CustomButton exitButton = new CustomButton("EXIT", customColor, customColor1, 1);
+        final CustomButton exitButton = new CustomButton("ESCI", customColor, customColor1, 1);
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -163,8 +163,6 @@ public final class MSHMenu {
 
         return panel;
     }
-
-
 
     public void closeWindow() {
         frame.setVisible(false);
