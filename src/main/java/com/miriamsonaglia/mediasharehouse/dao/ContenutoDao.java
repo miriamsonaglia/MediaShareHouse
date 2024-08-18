@@ -152,4 +152,20 @@ public class ContenutoDao {
         }
         return false;
     }
+
+    public String getFilePathFromDatabase(int idContenuto) {
+        String sql = "SELECT percorso_file FROM Contenuto WHERE id_contenuto = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, idContenuto);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("percorso_file");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
 }

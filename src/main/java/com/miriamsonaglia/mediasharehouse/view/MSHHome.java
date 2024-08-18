@@ -7,10 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,6 +33,8 @@ public final class MSHHome {
     private static Utente currentUser;
     private static String imagePath;
     private static JPanel homePanel;  // Panel principale per la Home
+
+    private static Map<Integer, CustomButton> houseButtonMap = new HashMap<>();
 
     public MSHHome(JFrame existingFrame, JPanel previousPanel, String imagePath, Utente currentUser) {
         this.frame = existingFrame;
@@ -111,6 +116,16 @@ public final class MSHHome {
         }
 
 
+        final CustomButton deleteButton = new CustomButton("DELETE A HOUSE", customColor, customColor1, 1);
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                showDeleteHouseDialog();
+            }
+        });
+        panel.add(deleteButton);
+        panel.add(Box.createVerticalStrut(10));
+
         // Pulsante per tornare al menu principale
         final CustomButton backButton = new CustomButton("BACK", customColor, customColor1, 1);
         backButton.addActionListener(new ActionListener() {
@@ -138,6 +153,38 @@ public final class MSHHome {
         return panel;
     }
 
+    private void showDeleteHouseDialog() {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            CasaDao casaDao = new CasaDao(connection);
+            List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
+    
+            if (userHouses.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Non hai case da eliminare.");
+                return;
+            }
+    
+            // Creazione del dialogo per la selezione della casa da eliminare
+            JComboBox<Casa> houseComboBox = new JComboBox<>(userHouses.toArray(new Casa[0]));
+            JPanel dialogPanel = new JPanel();
+            dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
+            dialogPanel.add(new JLabel("Seleziona la casa da eliminare:"));
+            dialogPanel.add(houseComboBox);
+    
+            int result = JOptionPane.showConfirmDialog(frame, dialogPanel, "Elimina Casa", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                Casa selectedCasa = (Casa) houseComboBox.getSelectedItem();
+                if (selectedCasa != null) {
+                    HouseManager houseManager = new HouseManager(frame, currentUser);
+                    houseManager.deleteHouse(selectedCasa.getIdCasa());
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+        }
+    }
+    
+
     public static void addHouseButtonToPanel(String houseName, int houseId) {
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
@@ -156,6 +203,16 @@ public final class MSHHome {
         homePanel.add(houseButton);
         homePanel.revalidate();
         homePanel.repaint();
+        houseButtonMap.put(houseId, houseButton);
+    }
+
+    public static void removeHouseButtonFromPanel(int houseId) {
+        CustomButton buttonToRemove = houseButtonMap.remove(houseId);
+        if (buttonToRemove != null) {
+            homePanel.remove(buttonToRemove);
+            homePanel.revalidate();
+            homePanel.repaint();
+        }
     }
 
     private void loadUserHouses() {
