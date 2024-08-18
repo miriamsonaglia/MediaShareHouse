@@ -53,4 +53,9 @@ public class Stanza {
     public void setIdCasa(int idCasa) {
         this.idCasa = idCasa;
     }
+
+    @Override
+    public String toString() {
+        return nome; // Ritorna solo il nome della casa
+    }
 }

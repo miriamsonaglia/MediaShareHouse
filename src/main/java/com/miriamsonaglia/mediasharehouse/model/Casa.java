@@ -57,4 +57,9 @@ public class Casa {
         this.username = username;
     }
 
+    @Override
+    public String toString() {
+        return nome; // Ritorna solo il nome della casa
+    }
+
 }

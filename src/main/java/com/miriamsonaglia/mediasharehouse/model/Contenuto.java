@@ -71,12 +71,6 @@ public class Contenuto {
     // Metodo toString per rappresentare l'oggetto come stringa
     @Override
     public String toString() {
-        return "Contenuto{" +
-                "idContenuto=" + idContenuto +
-                ", tipo='" + tipo + '\'' +
-                ", percorsoFile='" + percorsoFile + '\'' +
-                ", idStanza=" + idStanza +
-                ", username='" + username + '\'' +
-                '}';
+        return nome;
     }
 }
