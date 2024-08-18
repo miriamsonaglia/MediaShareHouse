@@ -117,7 +117,7 @@ public class HouseManager {
 
             if (isDeleted) {
                 connection.commit();
-                JOptionPane.showMessageDialog(frame, "Casa e tutte le stanze e contenuti sono stati eliminati con successo.");
+                JOptionPane.showMessageDialog(frame, "Casa eliminata con successo.");
                 MSHHome.removeHouseButtonFromPanel(idCasa);
             } else {
                 connection.rollback();

@@ -8,10 +8,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,6 +35,8 @@ public final class Room {
     private Casa currentHouse;
     private static String imagePath;
     private static Utente currentUser;
+
+    private static Map<Integer, CustomButton> roomButtonMap = new HashMap<>();
 
     public Room(JFrame existingFrame, JPanel previousPanel, String imagePath, int houseId, Utente currentUser) {
         this.frame = existingFrame;
@@ -85,6 +90,15 @@ public final class Room {
         panel.add(newRoomButton);
         panel.add(Box.createVerticalStrut(10));
 
+        final CustomButton deleteButton = new CustomButton("DELETE A ROOM", customColor, customColor1, 1);
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                showDeleteRoomDialog();
+            }
+        });
+        panel.add(deleteButton);
+        panel.add(Box.createVerticalStrut(10));
 
         // Pulsante per tornare al menu principale
         final CustomButton backButton = new CustomButton("BACK", customColor, customColor1, 1);
@@ -113,6 +127,36 @@ public final class Room {
 
     }
 
+    private void showDeleteRoomDialog() {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            StanzaDao stanzaDao = new StanzaDao(connection);
+            List<Stanza> userRooms = stanzaDao.getStanzeByCasa(currentHouse.getIdCasa());
+            if (userRooms.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Non hai stanze da eliminare.");
+                return;
+            }
+    
+            // Creazione del dialogo per la selezione della casa da eliminare
+            JComboBox<Stanza> roomComboBox = new JComboBox<>(userRooms.toArray(new Stanza[0]));
+            JPanel dialogPanel = new JPanel();
+            dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
+            dialogPanel.add(new JLabel("Seleziona la stanza da eliminare:"));
+            dialogPanel.add(roomComboBox);
+    
+            int result = JOptionPane.showConfirmDialog(frame, dialogPanel, "Elimina Stanza", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                Stanza selectedRoom = (Stanza) roomComboBox.getSelectedItem();
+                if (selectedRoom != null) {
+                    RoomManager roomManager = new RoomManager(frame, currentHouse);
+                    roomManager.deleteRoom(selectedRoom.getIdStanza());
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+        }
+    }
+
     // Metodo per aggiungere un nuovo pulsante per la stanza creata
     public static void addRoomButtonToPanel(String roomName, int roomId) {
         final Color customColor = new Color(218, 165, 32);
@@ -137,6 +181,16 @@ public final class Room {
         // Aggiungi il pannello al frame e aggiorna la visualizzazione
         roomPanel.revalidate();
         roomPanel.repaint();
+        roomButtonMap.put(roomId, roomButton);
+    }
+
+    public static void removeRoomButtonFromPanel(int roomId) {
+        CustomButton buttonToRemove = roomButtonMap.remove(roomId);
+        if (buttonToRemove != null) {
+            roomPanel.remove(buttonToRemove);
+            roomPanel.revalidate();
+            roomPanel.repaint();
+        }
     }
 
     private void loadHouseRooms() {

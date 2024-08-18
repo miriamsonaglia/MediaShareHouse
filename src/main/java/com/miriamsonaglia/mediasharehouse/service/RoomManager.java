@@ -2,6 +2,7 @@ package com.miriamsonaglia.mediasharehouse.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -12,9 +13,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
+import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 import com.miriamsonaglia.mediasharehouse.view.Room;
 
@@ -68,6 +71,45 @@ public class RoomManager {
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+        }
+
+    }
+
+    public void deleteRoom(int idStanza) {
+    try (Connection connection = DatabaseConnection.getConnection()) {
+        connection.setAutoCommit(false);
+
+        StanzaDao stanzaDao = new StanzaDao(connection);
+        ContenutoDao contenutoDao = new ContenutoDao(connection);
+
+        // Ottieni tutti i contenuti della stanza
+        List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
+
+        // Elimina i contenuti
+        for (Contenuto contenuto : contenuti) {
+            contenutoDao.deleteContenuto(contenuto.getIdContenuto());
+        }
+
+        // Elimina la stanza
+        boolean isDeleted = stanzaDao.deleteStanza(idStanza);
+
+        if (isDeleted) {
+            connection.commit();
+            JOptionPane.showMessageDialog(frame, "Stanza eliminata con successo.");
+            Room.removeRoomButtonFromPanel(idStanza);
+        } else {
+            connection.rollback();
+            JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della stanza.");
+        }
+        } catch (SQLException ex) {
+        ex.printStackTrace();
+        try {
+            // Rollback in caso di errore
+            DatabaseConnection.getConnection().rollback();
+        } catch (SQLException rollbackEx) {
+            rollbackEx.printStackTrace();
+        }
+        JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
 }
