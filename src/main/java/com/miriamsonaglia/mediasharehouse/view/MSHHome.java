@@ -19,11 +19,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.miriamsonaglia.mediasharehouse.dao.AccessoDao;
 import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.UtenteDAO;
+import com.miriamsonaglia.mediasharehouse.model.Accesso;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
+import com.miriamsonaglia.mediasharehouse.service.AccessManager;
 import com.miriamsonaglia.mediasharehouse.service.HouseManager;
 
 public final class MSHHome {
@@ -75,6 +78,17 @@ public final class MSHHome {
             }
         });
         panel.add(newHouseButton);
+        panel.add(Box.createVerticalStrut(10));
+
+        final CustomButton loginIntoHouse = new CustomButton("ACCEDI AD UNA CASA", customColor, customColor1, 1);
+        loginIntoHouse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                AccessManager accessManager = new AccessManager(frame, currentUser);
+                accessManager.openAccessFrame();
+            }
+        });
+        panel.add(loginIntoHouse);
         panel.add(Box.createVerticalStrut(10));
     
         // Mostra il pulsante "PASSA A MSH PREMIUM!" solo se l'utente ha un abbonamento base
@@ -156,7 +170,17 @@ public final class MSHHome {
     private void showDeleteHouseDialog() {
         try (Connection connection = DatabaseConnection.getConnection()) {
             CasaDao casaDao = new CasaDao(connection);
-            List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
+            AccessoDao accessoDao = new AccessoDao(connection);
+
+            // List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
+            List<Integer> userHousesID = accessoDao.getIdCaseByUsername(currentUser.getUsername());
+            List<Casa> userHouses = casaDao.getCaseByIdList(userHousesID);
+
+
+        
+
+
+            // List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
     
             if (userHouses.isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Non hai case da eliminare.");
@@ -175,7 +199,8 @@ public final class MSHHome {
                 Casa selectedCasa = (Casa) houseComboBox.getSelectedItem();
                 if (selectedCasa != null) {
                     HouseManager houseManager = new HouseManager(frame, currentUser);
-                    houseManager.deleteHouse(selectedCasa.getIdCasa());
+                    houseManager.searchAndDeleteHouse(selectedCasa.getIdCasa());
+                    removeHouseButtonFromPanel(selectedCasa.getIdCasa());
                 }
             }
         } catch (SQLException ex) {
@@ -219,9 +244,13 @@ public final class MSHHome {
     private void loadUserHouses() {
         try (Connection connection = DatabaseConnection.getConnection()) {
             CasaDao casaDao = new CasaDao(connection);
-            List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
+            AccessoDao accessoDao = new AccessoDao(connection);
 
-            for (Casa casa : userHouses) {
+            // List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
+            List<Integer> userHouses = accessoDao.getIdCaseByUsername(currentUser.getUsername());
+            List<Casa> casaList = casaDao.getCaseByIdList(userHouses);
+
+            for (Casa casa : casaList) {
                 addHouseButtonToPanel(casa.getNome(), casa.getIdCasa());
             }
         } catch (SQLException ex) {
@@ -229,6 +258,8 @@ public final class MSHHome {
             JOptionPane.showMessageDialog(frame, "Errore nel caricamento delle case dell'utente.");
         }
     }
+
+    
 
     public void closeWindow() {
         frame.setVisible(false);

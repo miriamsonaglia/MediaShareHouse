@@ -1,5 +1,6 @@
 package com.miriamsonaglia.mediasharehouse.dao;
 
+import java.security.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -67,29 +68,31 @@ public class CommentoDao {
     }
 
     // Metodo per ottenere tutti i commenti di un contenuto
-    public List<Commento> getCommentiByContenuto(int idContenuto) {
-        List<Commento> commentiList = new ArrayList<>();
-        String sql = "SELECT * FROM Commento WHERE id_contenuto = ?";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, idContenuto);
-            try (ResultSet rs = pstmt.executeQuery()) {
+    public List<Commento> getCommentiByContenuto(int idContenuto) throws SQLException {
+        List<Commento> commenti = new ArrayList<>();
+    
+        String query = "SELECT id_commento, testo, data_commento, id_contenuto, username FROM commento WHERE id_contenuto = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, idContenuto);
+    
+            try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Commento commento = new Commento(
-                        rs.getInt("id_commento"),
-                        rs.getString("testo"),
-                        rs.getTimestamp("data_commento"),
-                        rs.getInt("id_contenuto"),
-                        rs.getString("username"),
-                        rs.getObject("id_commento_padre", Integer.class)
-                    );
-                    commentiList.add(commento);
+                    int id = rs.getInt("id_commento");
+                    String testo = rs.getString("testo");
+                    java.sql.Timestamp data = rs.getTimestamp("data_commento");
+                    int contenutoId = rs.getInt("id_contenuto");
+                    String username = rs.getString("username");
+    
+                    Commento commento = new Commento(id, testo, data, contenutoId, username, null);
+                    commenti.add(commento);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return commentiList;
+        return commenti;
     }
+
+
+
 
     // Metodo per aggiornare un Commento esistente
     public boolean updateCommento(Commento commento) {

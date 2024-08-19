@@ -30,7 +30,7 @@ public final class Content {
     private JPanel previousPanel;
     private static JPanel contentPanel;  // Panel principale per il Contenuto
     private Stanza currentRoom;
-    private Utente currentUser;
+    private static Utente currentUser;
 
     public Content(JFrame existingFrame, JPanel previousPanel, String imagePath, int roomId, Utente currentUser) {
         this.frame = existingFrame;
@@ -113,7 +113,7 @@ public final class Content {
         return panel;
     }
 
-    public static void addContentButtonToPanel(String contentType, String filePath, String name) {
+    public static void addContentButtonToPanel(String contentType, String filePath, String name, int contentId) {
         System.out.println("Aggiungendo pulsante per il contenuto: " + name);
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
@@ -124,12 +124,13 @@ public final class Content {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
                 // Azione quando il pulsante del contenuto viene cliccato
-                new ContentViewer(frame, filePath, contentType);
+                new ContentViewer(frame, filePath, contentType, currentUser, contentId);
                 frame.revalidate();
                 frame.repaint();
             }
         });
     
+
         contentPanel.add(contentButton, 1);
         contentPanel.add(Box.createVerticalStrut(10));
         contentPanel.revalidate();
@@ -142,7 +143,7 @@ public final class Content {
             List<Contenuto> roomContent = contenutoDao.getContenutiByStanza(currentRoom.getIdStanza());
 
             for (Contenuto contenuto : roomContent) {
-                addContentButtonToPanel(contenuto.getTipo(), contenuto.getPercorsoFile(), contenuto.getNome());
+                addContentButtonToPanel(contenuto.getTipo(), contenuto.getPercorsoFile(), contenuto.getNome(), contenuto.getIdContenuto());
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

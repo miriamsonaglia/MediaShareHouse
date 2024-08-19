@@ -13,10 +13,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.miriamsonaglia.mediasharehouse.dao.AccessoDao;
 import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
 import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
+import com.miriamsonaglia.mediasharehouse.model.Accesso;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
@@ -70,13 +72,17 @@ public class HouseManager {
                 if (!houseName.isEmpty()) {
                     // Creazione di un nuovo oggetto Casa
                     Casa newCasa = new Casa(0, houseName, generateUniqueAccessKey(), houseState, currentUser.getUsername());
-
+                    
                     // Inserimento nel database tramite CasaDao
                     boolean isCreated = casaDao.createCasa(newCasa);
 
                     if (isCreated) {
                         JOptionPane.showMessageDialog(frame, "Casa creata con successo!");
                         // Passa l'ID della nuova casa al metodo che aggiunge i pulsanti
+                        AccessoDao accessoDao = new AccessoDao(connection);
+                        Accesso newAccesso = new Accesso(0, currentUser.getUsername(), newCasa.getIdCasa());
+                        accessoDao.createAccesso(newAccesso);
+
                         MSHHome.addHouseButtonToPanel(newCasa.getNome(), newCasa.getIdCasa());
                     } else {
                         JOptionPane.showMessageDialog(frame, "Errore durante la creazione della casa.");
@@ -90,6 +96,23 @@ public class HouseManager {
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
+
+    public void searchAndDeleteHouse(int idCasa) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            CasaDao casaDao = new CasaDao(connection);
+            Casa casa = casaDao.getCasaByIdAndUser(idCasa, currentUser.getUsername());
+
+            if (casa != null) {
+                deleteHouse(idCasa);
+            } else {
+                removeAccessToHouse(idCasa);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+        }
+    }
+    
 
     public void deleteHouse(int idCasa) {
         try (Connection connection = DatabaseConnection.getConnection()) {
@@ -131,6 +154,22 @@ public class HouseManager {
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
             }*/
+        }
+    }
+
+    public void removeAccessToHouse(int idCasa) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            AccessoDao accessoDao = new AccessoDao(connection);
+            boolean isRemoved = accessoDao.deleteAccessoByCasa(idCasa, currentUser.getUsername());
+
+            if (isRemoved) {
+                JOptionPane.showMessageDialog(frame, "Accesso alla casa rimosso con successo.");
+            } else {
+                JOptionPane.showMessageDialog(frame, "Errore durante la rimozione dell'accesso alla casa.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
 

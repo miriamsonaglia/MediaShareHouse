@@ -29,7 +29,7 @@ public class UploadContent {
     private JFrame frame;
     private Stanza currentRoom;
     private Utente currentUser; // Aggiunto
-    private String path = "../../../../../resources/files/";
+    private String path = "src/main/resources/files/";
 
     public UploadContent(JFrame frame, Stanza currentRoom, Utente currentUser) { // Modificato il costruttore
         this.frame = frame;

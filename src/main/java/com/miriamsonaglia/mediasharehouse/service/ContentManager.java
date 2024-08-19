@@ -56,11 +56,14 @@ public class ContentManager {
 
                 if (!contentName.isEmpty() && !contentPath.isEmpty()) {
                     Contenuto newContenuto = new Contenuto(0, contentName, contentType, contentPath, currentRoom.getIdStanza(), null);
+                    int idContenuto = newContenuto.getIdContenuto();
+                    
                     boolean isCreated = contenutoDao.createContenuto(newContenuto);
 
                     if (isCreated) {
                         JOptionPane.showMessageDialog(frame, "Contenuto aggiunto con successo!");
-                        Content.addContentButtonToPanel(contentType, contentPath, contentName);
+                        Content.addContentButtonToPanel(contentType, contentPath, contentName, idContenuto);
+
                     } else {
                         JOptionPane.showMessageDialog(frame, "Errore durante l'aggiunta del contenuto.");
                     }
