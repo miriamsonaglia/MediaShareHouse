@@ -23,7 +23,6 @@ import com.miriamsonaglia.mediasharehouse.dao.AccessoDao;
 import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.UtenteDAO;
-import com.miriamsonaglia.mediasharehouse.model.Accesso;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
 import com.miriamsonaglia.mediasharehouse.service.AccessManager;
@@ -89,6 +88,19 @@ public final class MSHHome {
             }
         });
         panel.add(loginIntoHouse);
+        panel.add(Box.createVerticalStrut(10));
+
+        final CustomButton lookAtTheLists = new CustomButton("VISUALIZZA LE CLASSIFICHE", customColor, customColor1, 1);
+        lookAtTheLists.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                frame.getContentPane().removeAll(); // Rimuovi tutti i componenti precedenti
+                new ListsViewer(frame, homePanel, imagePath); // Passa il frame esistente e il pannello corrente
+                frame.revalidate(); // Aggiorna il layout del frame
+                frame.repaint(); // Ridisegna il frame
+            }
+        });
+        panel.add(lookAtTheLists);
         panel.add(Box.createVerticalStrut(10));
     
         // Mostra il pulsante "PASSA A MSH PREMIUM!" solo se l'utente ha un abbonamento base

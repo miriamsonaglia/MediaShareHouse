@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.miriamsonaglia.mediasharehouse.model.Utente;
 
@@ -87,6 +89,30 @@ public class UtenteDAO {
             System.out.println("Errore durante l'aggiornamento dell'utente: " + e.getMessage());
             return false;
         }
+    }
+
+    // Metodo per ottenere i nomi degli utenti con il maggior numero di case
+    public List<String> getTopUsersByNumberOfHouses(int limit) {
+        List<String> users = new ArrayList<>();
+        String sql = "SELECT u.username, COUNT(c.id_casa) AS num_case " +
+                     "FROM Utente u " +
+                     "JOIN Casa c ON u.username = c.username " +
+                     "GROUP BY u.username " +
+                     "ORDER BY num_case DESC " +
+                     "LIMIT ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(rs.getString("username"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Errore durante il recupero degli utenti con il maggior numero di case: " + e.getMessage());
+        }
+
+        return users;
     }
 
     // Metodo per cancellare un utente dal database
