@@ -61,7 +61,7 @@ public class ContentViewer {
 
         switch (contentType) {
             case "song":
-                displayer = new AudioDisplayer();
+                displayer = new AudioDisplayer(contentFile);
                 break;
             case "movie":
                 displayer = new VideoDisplayer();
@@ -82,7 +82,7 @@ public class ContentViewer {
     private JPanel createChatPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setPreferredSize(new Dimension(300, frame.getHeight()));
+        panel.setPreferredSize(new Dimension(frame.getWidth()/2, frame.getHeight()));
 
         JTextArea chatArea = new JTextArea();
         chatArea.setEditable(false); // Rende l'area di chat non modificabile
@@ -106,7 +106,7 @@ public class ContentViewer {
         }
 
         JTextArea inputArea = new JTextArea();
-        inputArea.setMaximumSize(new Dimension(300, 100)); // Imposta altezza massima per l'area input
+        inputArea.setMaximumSize(new Dimension(frame.getWidth()/2, frame.getHeight())); // Imposta altezza massima per l'area input
         panel.add(inputArea);
 
         
