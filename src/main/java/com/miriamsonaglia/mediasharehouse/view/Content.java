@@ -7,10 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -22,6 +25,7 @@ import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
+import com.miriamsonaglia.mediasharehouse.service.ContentManager;
 import com.miriamsonaglia.mediasharehouse.service.UploadContent;
 
 public final class Content {
@@ -31,6 +35,8 @@ public final class Content {
     private static JPanel contentPanel;  // Panel principale per il Contenuto
     private Stanza currentRoom;
     private static Utente currentUser;
+
+    private static Map<Integer, CustomButton> contentButtonMap = new HashMap<>();
 
     public Content(JFrame existingFrame, JPanel previousPanel, String imagePath, int roomId, Utente currentUser) {
         this.frame = existingFrame;
@@ -87,6 +93,16 @@ public final class Content {
         panel.add(newContentButton);
         panel.add(Box.createVerticalStrut(10));
 
+        final CustomButton deleteButton = new CustomButton("ELIMINA UN CONTENUTO", customColor, customColor1, 1);
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                showDeleteContentDialog();
+            }
+        });
+        panel.add(deleteButton);
+        panel.add(Box.createVerticalStrut(10));
+
         // Pulsante per tornare al menu precedente
         final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
         backButton.addActionListener(new ActionListener() {
@@ -113,6 +129,36 @@ public final class Content {
         return panel;
     }
 
+    private void showDeleteContentDialog() {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            ContenutoDao contenutoDao = new ContenutoDao(connection);
+            List<Contenuto> roomContent = contenutoDao.getContenutiByStanza(currentRoom.getIdStanza());
+            if (roomContent.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Non ci sono contenuti da eliminare.");
+                return;
+            }
+    
+            // Creazione del dialogo per la selezione del contenuto da eliminare
+            JComboBox<Contenuto> contentComboBox = new JComboBox<>(roomContent.toArray(new Contenuto[0]));
+            JPanel dialogPanel = new JPanel();
+            dialogPanel.setLayout(new BoxLayout(dialogPanel, BoxLayout.Y_AXIS));
+            dialogPanel.add(new JLabel("Seleziona il contenuto da eliminare:"));
+            dialogPanel.add(contentComboBox);
+    
+            int result = JOptionPane.showConfirmDialog(frame, dialogPanel, "Elimina Contenuto", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                Contenuto selectedContent = (Contenuto) contentComboBox.getSelectedItem();
+                if (selectedContent != null) {
+                    ContentManager contentManager = new ContentManager(frame, currentRoom);
+                    contentManager.deleteContent(selectedContent.getIdContenuto());
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+        }
+    }
+
     public static void addContentButtonToPanel(String contentType, String filePath, String name, int contentId) {
         System.out.println("Aggiungendo pulsante per il contenuto: " + name);
         final Color customColor = new Color(218, 165, 32);
@@ -135,6 +181,16 @@ public final class Content {
         contentPanel.add(Box.createVerticalStrut(10));
         contentPanel.revalidate();
         contentPanel.repaint();
+        contentButtonMap.put(contentId, contentButton);
+    }
+
+    public static void removeContentButtonFromPanel(int roomId) {
+        CustomButton buttonToRemove = contentButtonMap.remove(roomId);
+        if (buttonToRemove != null) {
+            contentPanel.remove(buttonToRemove);
+            contentPanel.revalidate();
+            contentPanel.repaint();
+        }
     }
 
     private void loadRoomContent() {

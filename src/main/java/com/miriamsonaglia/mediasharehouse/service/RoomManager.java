@@ -76,40 +76,47 @@ public class RoomManager {
     }
 
     public void deleteRoom(int idStanza) {
-    try (Connection connection = DatabaseConnection.getConnection()) {
-        connection.setAutoCommit(false);
-
-        StanzaDao stanzaDao = new StanzaDao(connection);
-        ContenutoDao contenutoDao = new ContenutoDao(connection);
-
-        // Ottieni tutti i contenuti della stanza
-        List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
-
-        // Elimina i contenuti
-        for (Contenuto contenuto : contenuti) {
-            contenutoDao.deleteContenuto(contenuto.getIdContenuto());
-        }
-
-        // Elimina la stanza
-        boolean isDeleted = stanzaDao.deleteStanza(idStanza);
-
-        if (isDeleted) {
-            connection.commit();
-            JOptionPane.showMessageDialog(frame, "Stanza eliminata con successo.");
-            Room.removeRoomButtonFromPanel(idStanza);
-        } else {
-            connection.rollback();
-            JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della stanza.");
-        }
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            connection.setAutoCommit(false);
+    
+            StanzaDao stanzaDao = new StanzaDao(connection);
+            ContenutoDao contenutoDao = new ContenutoDao(connection);
+    
+            // Conferma l'eliminazione
+            int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa stanza e tutti i suoi contenuti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Ottieni tutti i contenuti della stanza
+                List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
+    
+                // Elimina i contenuti
+                for (Contenuto contenuto : contenuti) {
+                    contenutoDao.deleteContenuto(contenuto.getIdContenuto());
+                }
+    
+                // Elimina la stanza
+                boolean isDeleted = stanzaDao.deleteStanza(idStanza);
+    
+                if (isDeleted) {
+                    connection.commit();
+                    JOptionPane.showMessageDialog(frame, "Stanza eliminata con successo.");
+                    Room.removeRoomButtonFromPanel(idStanza);
+                } else {
+                    connection.rollback();
+                    JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della stanza.");
+                }
+            } else {
+                connection.rollback();
+            }
         } catch (SQLException ex) {
-        ex.printStackTrace();
-        try {
-            // Rollback in caso di errore
-            DatabaseConnection.getConnection().rollback();
-        } catch (SQLException rollbackEx) {
-            rollbackEx.printStackTrace();
-        }
-        JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+            ex.printStackTrace();
+            try {
+                // Rollback in caso di errore
+                DatabaseConnection.getConnection().rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
+    
 }

@@ -76,4 +76,25 @@ public class ContentManager {
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
+
+    public void deleteContent(int idContenuto) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            ContenutoDao contenutoDao = new ContenutoDao(connection);
+
+            // Conferma l'eliminazione
+            int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questo contenuto?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean isDeleted = contenutoDao.deleteContenuto(idContenuto);
+                if (isDeleted) {
+                    JOptionPane.showMessageDialog(frame, "Contenuto eliminato con successo.");
+                    Content.removeContentButtonFromPanel(idContenuto);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione del contenuto.");
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+        }
+    }
 }
