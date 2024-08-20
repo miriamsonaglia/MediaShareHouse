@@ -15,11 +15,13 @@ import javax.swing.JTextField;
 
 import com.miriamsonaglia.mediasharehouse.dao.AccessoDao;
 import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
+import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
 import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
 import com.miriamsonaglia.mediasharehouse.model.Accesso;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
+import com.miriamsonaglia.mediasharehouse.model.Commento;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
@@ -115,43 +117,54 @@ public class HouseManager {
     
 
     public void deleteHouse(int idCasa) {
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            connection.setAutoCommit(false);
-    
-            CasaDao casaDao = new CasaDao(connection);
-            StanzaDao stanzaDao = new StanzaDao(connection);
-            ContenutoDao contenutoDao = new ContenutoDao(connection);
-    
-            // Conferma l'eliminazione
-            int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa casa e tutte le sue stanze e contenuti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                // Ottieni tutte le stanze della casa
-                List<Stanza> stanze = stanzaDao.getStanzeByCasa(idCasa);
-    
-                // Elimina i contenuti di ogni stanza
-                for (Stanza stanza : stanze) {
-                    List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(stanza.getIdStanza());
-                    for (Contenuto contenuto : contenuti) {
-                        contenutoDao.deleteContenuto(contenuto.getIdContenuto());
+    try (Connection connection = DatabaseConnection.getConnection()) {
+        connection.setAutoCommit(false);
+
+        CasaDao casaDao = new CasaDao(connection);
+        StanzaDao stanzaDao = new StanzaDao(connection);
+        ContenutoDao contenutoDao = new ContenutoDao(connection);
+        CommentoDao commentoDao = new CommentoDao(connection);
+        AccessoDao accessoDao = new AccessoDao(connection);
+
+        // Conferma l'eliminazione
+        int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa casa e tutte le sue stanze, contenuti, commenti e accessi?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Ottieni tutte le stanze della casa
+            List<Stanza> stanze = stanzaDao.getStanzeByCasa(idCasa);
+
+            // Elimina i contenuti di ogni stanza
+            for (Stanza stanza : stanze) {
+                List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(stanza.getIdStanza());
+                for (Contenuto contenuto : contenuti) {
+                    // Elimina i commenti di ogni contenuto
+                    List<Commento> commenti = commentoDao.getCommentiByContenuto(contenuto.getIdContenuto());
+                    for (Commento commento : commenti) {
+                        commentoDao.deleteCommento(commento.getIdCommento());
                     }
-                    // Elimina la stanza
-                    stanzaDao.deleteStanza(stanza.getIdStanza());
+                    // Elimina il contenuto
+                    contenutoDao.deleteContenuto(contenuto.getIdContenuto());
                 }
-    
-                // Elimina la casa
-                boolean isDeleted = casaDao.deleteCasa(idCasa);
-    
-                if (isDeleted) {
-                    connection.commit();
-                    JOptionPane.showMessageDialog(frame, "Casa eliminata con successo.");
-                    MSHHome.removeHouseButtonFromPanel(idCasa);
-                } else {
-                    connection.rollback();
-                    JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della casa.");
-                }
+                // Elimina la stanza
+                stanzaDao.deleteStanza(stanza.getIdStanza());
+            }
+
+            // Elimina gli accessi relativi alla casa
+            accessoDao.deleteAccessiByCasa(idCasa);
+
+            // Elimina la casa
+            boolean isDeleted = casaDao.deleteCasa(idCasa);
+
+            if (isDeleted) {
+                connection.commit();
+                JOptionPane.showMessageDialog(frame, "Casa eliminata con successo.");
+                MSHHome.removeHouseButtonFromPanel(idCasa);
             } else {
                 connection.rollback();
+                JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della casa.");
             }
+        } else {
+            connection.rollback();
+        }
         } catch (SQLException ex) {
             ex.printStackTrace();
             try {
@@ -163,6 +176,7 @@ public class HouseManager {
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
+
     
 
     public void removeAccessToHouse(int idCasa) {

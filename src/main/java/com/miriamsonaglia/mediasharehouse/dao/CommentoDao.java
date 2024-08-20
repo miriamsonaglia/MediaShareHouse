@@ -1,6 +1,5 @@
 package com.miriamsonaglia.mediasharehouse.dao;
 
-import java.security.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -124,4 +123,18 @@ public class CommentoDao {
         }
         return false;
     }
+
+    public boolean deleteCommentiByContenuto(int idContenuto) {
+        String sql = "DELETE FROM Commento WHERE id_contenuto = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, idContenuto);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+
 }

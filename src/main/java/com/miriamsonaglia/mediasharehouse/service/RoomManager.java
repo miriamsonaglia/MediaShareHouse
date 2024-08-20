@@ -13,10 +13,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
 import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
+import com.miriamsonaglia.mediasharehouse.model.Commento;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 import com.miriamsonaglia.mediasharehouse.view.Room;
@@ -75,38 +77,46 @@ public class RoomManager {
 
     }
 
-    public void deleteRoom(int idStanza) {
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            connection.setAutoCommit(false);
-    
-            StanzaDao stanzaDao = new StanzaDao(connection);
-            ContenutoDao contenutoDao = new ContenutoDao(connection);
-    
-            // Conferma l'eliminazione
-            int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa stanza e tutti i suoi contenuti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                // Ottieni tutti i contenuti della stanza
-                List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
-    
-                // Elimina i contenuti
-                for (Contenuto contenuto : contenuti) {
-                    contenutoDao.deleteContenuto(contenuto.getIdContenuto());
+   public void deleteRoom(int idStanza) {
+    try (Connection connection = DatabaseConnection.getConnection()) {
+        connection.setAutoCommit(false);
+
+        StanzaDao stanzaDao = new StanzaDao(connection);
+        ContenutoDao contenutoDao = new ContenutoDao(connection);
+        CommentoDao commentoDao = new CommentoDao(connection);
+
+        // Conferma l'eliminazione
+        int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa stanza e tutti i suoi contenuti e commenti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Ottieni tutti i contenuti della stanza
+            List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
+
+            // Elimina i commenti e i contenuti
+            for (Contenuto contenuto : contenuti) {
+                // Ottieni e elimina tutti i commenti associati al contenuto
+                List<Commento> commenti = commentoDao.getCommentiByContenuto(contenuto.getIdContenuto());
+                for (Commento commento : commenti) {
+                    commentoDao.deleteCommento(commento.getIdCommento());
                 }
-    
-                // Elimina la stanza
-                boolean isDeleted = stanzaDao.deleteStanza(idStanza);
-    
-                if (isDeleted) {
-                    connection.commit();
-                    JOptionPane.showMessageDialog(frame, "Stanza eliminata con successo.");
-                    Room.removeRoomButtonFromPanel(idStanza);
-                } else {
-                    connection.rollback();
-                    JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della stanza.");
-                }
+
+                // Elimina il contenuto
+                contenutoDao.deleteContenuto(contenuto.getIdContenuto());
+            }
+
+            // Elimina la stanza
+            boolean isDeleted = stanzaDao.deleteStanza(idStanza);
+
+            if (isDeleted) {
+                connection.commit();
+                JOptionPane.showMessageDialog(frame, "Stanza eliminata con successo.");
+                Room.removeRoomButtonFromPanel(idStanza);
             } else {
                 connection.rollback();
+                JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della stanza.");
             }
+        } else {
+            connection.rollback();
+        }
         } catch (SQLException ex) {
             ex.printStackTrace();
             try {
@@ -118,5 +128,6 @@ public class RoomManager {
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
+
     
 }

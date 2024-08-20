@@ -1,13 +1,13 @@
 package com.miriamsonaglia.mediasharehouse.dao;
 
-import com.miriamsonaglia.mediasharehouse.model.Accesso;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.miriamsonaglia.mediasharehouse.model.Accesso;
 
 public class AccessoDao {
 
@@ -141,4 +141,17 @@ public class AccessoDao {
         }
         return false;
     }
+
+    public boolean deleteAccessiByCasa(int idCasa) {
+        String sql = "DELETE FROM Accesso WHERE id_casa = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, idCasa);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

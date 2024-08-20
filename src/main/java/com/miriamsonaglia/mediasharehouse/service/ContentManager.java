@@ -2,6 +2,7 @@ package com.miriamsonaglia.mediasharehouse.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -12,8 +13,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
 import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
+import com.miriamsonaglia.mediasharehouse.model.Commento;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 import com.miriamsonaglia.mediasharehouse.view.Content;
@@ -78,23 +81,46 @@ public class ContentManager {
     }
 
     public void deleteContent(int idContenuto) {
-        try (Connection connection = DatabaseConnection.getConnection()) {
-            ContenutoDao contenutoDao = new ContenutoDao(connection);
+    try (Connection connection = DatabaseConnection.getConnection()) {
+        connection.setAutoCommit(false);  // Inizia una transazione
 
-            // Conferma l'eliminazione
-            int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questo contenuto?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                boolean isDeleted = contenutoDao.deleteContenuto(idContenuto);
-                if (isDeleted) {
-                    JOptionPane.showMessageDialog(frame, "Contenuto eliminato con successo.");
-                    Content.removeContentButtonFromPanel(idContenuto);
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione del contenuto.");
-                }
+        ContenutoDao contenutoDao = new ContenutoDao(connection);
+        CommentoDao commentoDao = new CommentoDao(connection);
+
+        // Conferma l'eliminazione
+        int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questo contenuto e tutti i suoi commenti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            // Ottieni tutti i commenti associati al contenuto
+            List<Commento> commenti = commentoDao.getCommentiByContenuto(idContenuto);
+
+            // Elimina i commenti
+            for (Commento commento : commenti) {
+                commentoDao.deleteCommento(commento.getIdCommento());
             }
+
+            // Elimina il contenuto
+            boolean isDeleted = contenutoDao.deleteContenuto(idContenuto);
+            if (isDeleted) {
+                connection.commit();  // Conferma la transazione
+                JOptionPane.showMessageDialog(frame, "Contenuto e commenti eliminati con successo.");
+                Content.removeContentButtonFromPanel(idContenuto);
+            } else {
+                connection.rollback();  // Annulla la transazione in caso di errore
+                JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione del contenuto.");
+            }
+        } else {
+            connection.rollback();  // Annulla la transazione se l'utente annulla
+        }
         } catch (SQLException ex) {
             ex.printStackTrace();
+            try {
+                // Rollback in caso di errore
+                DatabaseConnection.getConnection().rollback();
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
     }
+
 }
