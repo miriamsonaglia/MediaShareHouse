@@ -1,10 +1,13 @@
 package com.miriamsonaglia.mediasharehouse.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,6 +17,7 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
+import com.miriamsonaglia.mediasharehouse.dao.ValutazioneDao;
 import com.miriamsonaglia.mediasharehouse.model.Commento;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
 
@@ -36,16 +41,22 @@ public class ContentViewer {
     private File contentFile;
     private Utente currentUser;
     private int idContenuto;
+    private JPanel previousPanel;
 
 
-    public ContentViewer(JFrame frame, String filePath, String contentType, Utente currentUser, int idContenuto) {
+    public ContentViewer(JFrame frame, String filePath, String contentType, Utente currentUser, int idContenuto, JPanel previousPanel) {
         this.frame = frame;
         this.contentFile = new File(filePath);
         this.currentUser = currentUser;
         this.idContenuto = idContenuto;
+        this.previousPanel = previousPanel;
+
 
         // Imposta il layout del frame come BorderLayout
         frame.setLayout(new BorderLayout());
+
+        // Aggiungi il pulsante "INDIETRO" al frame
+        addBackButton(frame);
 
         // Crea i pannelli per la visualizzazione del contenuto e la chat
         contentPanel = createContentPanel(contentType);
@@ -54,6 +65,10 @@ public class ContentViewer {
         // Aggiunge i pannelli al frame
         frame.add(contentPanel, BorderLayout.CENTER);
         frame.add(chatPanel, BorderLayout.EAST);
+
+        // Crea il pannello di valutazione e aggiungilo in alto (NORTH) nel frame
+        JPanel ratingPanel = createRatingPanel();
+        frame.add(ratingPanel, BorderLayout.NORTH);
 
         frame.revalidate();
         frame.repaint();
@@ -227,5 +242,58 @@ public class ContentViewer {
         return panel;
     }
     
-    
+    // Metodo per creare il pannello di valutazione
+    private JPanel createRatingPanel() {
+        JPanel ratingPanel = new JPanel();
+
+        JLabel ratingLabel = new JLabel("Valutazione: ");
+        String[] ratings = { "1", "2", "3", "4", "5" };
+        JComboBox<String> ratingComboBox = new JComboBox<>(ratings);
+
+        // Disabilita la combo box dopo la selezione
+        ratingComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    ratingComboBox.setEnabled(false);
+                    int selectedRating = Integer.parseInt((String) ratingComboBox.getSelectedItem());
+                    saveRating(selectedRating);
+                }
+            }
+        });
+
+        ratingPanel.add(ratingLabel);
+        ratingPanel.add(ratingComboBox);
+
+        return ratingPanel;
+    }
+
+    // Metodo per salvare la valutazione nel database
+    private void saveRating(int rating) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            ValutazioneDao valutazioneDao = new ValutazioneDao(connection);
+            valutazioneDao.createValutazione(idContenuto, rating);
+            JOptionPane.showMessageDialog(frame, "Valutazione salvata con successo!");
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Errore nel salvataggio della valutazione.");
+        }
+    }
+
+    private void addBackButton(JFrame frame) {
+        final Color customColor = new Color(218, 165, 32);
+        final Color customColor1 = new Color(101, 67, 33);
+        final CustomButton backButton = new CustomButton("BACK", customColor, customColor1, 1);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(previousPanel);  // Torna al pannello precedente
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        frame.add(backButton, BorderLayout.SOUTH);
+    }
+
 }

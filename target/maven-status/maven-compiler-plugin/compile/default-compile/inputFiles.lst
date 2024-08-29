@@ -6,6 +6,7 @@ C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\Me
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\dao\DatabaseCreation.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\dao\StanzaDao.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\dao\UtenteDAO.java
+C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\dao\ValutazioneDao.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\model\Abbonamento.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\model\Accesso.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\model\Casa.java
@@ -13,6 +14,7 @@ C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\Me
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\model\Contenuto.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\model\Stanza.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\model\Utente.java
+C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\model\Valutazione.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\service\AccessManager.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\service\ContentManager.java
 C:\Users\miria\Desktop\UNI\Secondo anno\Basi di Dati\Progetto\MediaShareHouse\MediaShareHouse\src\main\java\com\miriamsonaglia\mediasharehouse\service\HouseManager.java

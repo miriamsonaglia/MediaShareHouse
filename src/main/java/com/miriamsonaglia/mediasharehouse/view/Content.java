@@ -170,7 +170,7 @@ public final class Content {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
                 // Azione quando il pulsante del contenuto viene cliccato
-                new ContentViewer(frame, filePath, contentType, currentUser, contentId);
+                new ContentViewer(frame, filePath, contentType, currentUser, contentId, contentPanel);
                 frame.revalidate();
                 frame.repaint();
             }
