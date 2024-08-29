@@ -186,7 +186,7 @@ public class ContentViewer {
                         }
     
                         // Messaggio dell'utente corrente
-                        JLabel newMessageLabel = new JLabel("You: " + message);
+                        JLabel newMessageLabel = new JLabel(commento.getUsername() + ":" + message);
                         newMessagePanel.add(newMessageLabel);
     
                         // Pulsante "Rispondi" per il nuovo messaggio
