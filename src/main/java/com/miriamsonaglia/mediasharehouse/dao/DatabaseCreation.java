@@ -79,10 +79,13 @@ public class DatabaseCreation {
                 "FOREIGN KEY (id_commento_padre) REFERENCES Commento(id_commento)" +
             ")",
             "CREATE TABLE IF NOT EXISTS Valutazione (" +
-                "id_valutazione INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "n_stelle INTEGER CHECK (n_stelle >= 1 AND n_stelle <= 5)," +
-                "id_contenuto INTEGER," +
-                "FOREIGN KEY (id_contenuto) REFERENCES Contenuto(id_contenuto)" +
+                "id_valutazione INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "n_stelle INTEGER CHECK (n_stelle >= 1 AND n_stelle <= 5), " +
+                "id_contenuto INTEGER, " +
+                "username TEXT, " +
+                "FOREIGN KEY (id_contenuto) REFERENCES Contenuto(id_contenuto), " +
+                "FOREIGN KEY (username) REFERENCES Utente(username), " +
+                "UNIQUE (id_contenuto, username)" +
             ")"
         };
 

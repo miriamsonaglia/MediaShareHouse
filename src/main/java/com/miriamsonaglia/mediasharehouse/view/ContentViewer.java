@@ -26,7 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import com.miriamsonaglia.mediasharehouse.dao.AccessoDao;
 import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
+import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.ValutazioneDao;
 import com.miriamsonaglia.mediasharehouse.model.Commento;
@@ -242,43 +244,89 @@ public class ContentViewer {
         return panel;
     }
     
-    // Metodo per creare il pannello di valutazione
+
+    private boolean canUserRate(int idContenuto, String username) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            AccessoDao accessoDao = new AccessoDao(connection);
+            ContenutoDao contenutoDao = new ContenutoDao(connection);
+    
+            // Ottieni l'ID della casa attraverso la relazione tra Contenuto e Stanza
+            Integer idCasa = contenutoDao.getIdCasaByIdContenuto(idContenuto);
+            if (idCasa == null) {
+                return false; // Il contenuto non è associato a una casa valida
+            }
+    
+            // Verifica se l'utente ha accesso alla casa
+            return accessoDao.hasAccess(username, idCasa);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Errore durante il controllo dell'accesso.");
+            return false;
+        }
+    }
+
     private JPanel createRatingPanel() {
         JPanel ratingPanel = new JPanel();
-
+    
         JLabel ratingLabel = new JLabel("Valutazione: ");
         String[] ratings = { "1", "2", "3", "4", "5" };
         JComboBox<String> ratingComboBox = new JComboBox<>(ratings);
-
-        // Disabilita la combo box dopo la selezione
-        ratingComboBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    ratingComboBox.setEnabled(false);
-                    int selectedRating = Integer.parseInt((String) ratingComboBox.getSelectedItem());
-                    saveRating(selectedRating);
+    
+        // Etichetta per visualizzare la media dei voti
+        JLabel averageRatingLabel = new JLabel();
+        updateAverageRating(averageRatingLabel); // Inizializza la media
+    
+        // Controlla se l'utente può votare
+        if (!canUserRate(idContenuto, currentUser.getUsername())) {
+            ratingComboBox.setEnabled(false);
+            ratingLabel.setText("Non hai accesso per votare.");
+        } else {
+            ratingComboBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        int selectedRating = Integer.parseInt((String) ratingComboBox.getSelectedItem());
+                        saveRating(selectedRating, averageRatingLabel); // Passa l'etichetta della media
+                    }
                 }
-            }
-        });
-
+            });
+        }
+    
         ratingPanel.add(ratingLabel);
         ratingPanel.add(ratingComboBox);
-
+        ratingPanel.add(averageRatingLabel);
+    
         return ratingPanel;
     }
+    
 
-    // Metodo per salvare la valutazione nel database
-    private void saveRating(int rating) {
+    private void saveRating(int rating, JLabel averageRatingLabel) {
         try (Connection connection = DatabaseConnection.getConnection()) {
             ValutazioneDao valutazioneDao = new ValutazioneDao(connection);
-            valutazioneDao.createValutazione(idContenuto, rating);
+    
+            // Aggiorna o inserisce la valutazione
+            valutazioneDao.saveOrUpdateRating(idContenuto, rating, currentUser.getUsername());
             JOptionPane.showMessageDialog(frame, "Valutazione salvata con successo!");
+    
+            // Aggiorna la media dei voti
+            updateAverageRating(averageRatingLabel); // Passa l'etichetta della media da aggiornare
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(frame, "Errore nel salvataggio della valutazione.");
         }
     }
+
+    private void updateAverageRating(JLabel averageRatingLabel) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            ValutazioneDao valutazioneDao = new ValutazioneDao(connection);
+            double average = valutazioneDao.getAverageRating(idContenuto);
+            averageRatingLabel.setText(String.format("Media: %.2f", average));
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            averageRatingLabel.setText("Errore nel calcolo della media.");
+        }
+    }
+
 
     private void addBackButton(JFrame frame) {
         final Color customColor = new Color(218, 165, 32);

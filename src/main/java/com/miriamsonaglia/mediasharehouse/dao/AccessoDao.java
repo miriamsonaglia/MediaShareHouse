@@ -154,4 +154,21 @@ public class AccessoDao {
         return false;
     }
 
+    // Metodo per verificare se un utente ha accesso a una casa specifica
+    public boolean hasAccess(String username, int idCasa) {
+        String sql = "SELECT COUNT(*) AS count FROM Accesso WHERE username = ? AND id_casa = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setInt(2, idCasa);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

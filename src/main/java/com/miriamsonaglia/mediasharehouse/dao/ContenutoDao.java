@@ -167,5 +167,39 @@ public class ContenutoDao {
         }
         return null;
     }
+
+    // Metodo per ottenere l'ID della casa dato l'ID del contenuto
+    public Integer getIdCasa(int idContenuto) {
+        String sql = "SELECT id_casa FROM Contenuto WHERE id_contenuto = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, idContenuto);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_casa");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;  // Ritorna null se non trova il contenuto o in caso di errore
+    }
+
+    public Integer getIdCasaByIdContenuto(int idContenuto) {
+        String sql = "SELECT s.id_casa " +
+                     "FROM Contenuto c " +
+                     "JOIN Stanza s ON c.id_stanza = s.id_stanza " +
+                     "WHERE c.id_contenuto = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, idContenuto);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_casa");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
 }

@@ -133,4 +133,62 @@ public class ValutazioneDao {
         }
     }
 
+    public Integer getUserRating(int idContenuto, String username) throws SQLException {
+        String query = "SELECT n_stelle FROM Valutazione WHERE id_contenuto = ? AND username = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, idContenuto);
+            stmt.setString(2, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("n_stelle");
+            }
+        }
+        return null;
+    }
+
+    public void saveOrUpdateRating(int idContenuto, int rating, String username) throws SQLException {
+        String querySelect = "SELECT id_valutazione FROM Valutazione WHERE id_contenuto = ? AND username = ?";
+        String queryInsert = "INSERT INTO Valutazione (n_stelle, id_contenuto, username) VALUES (?, ?, ?)";
+        String queryUpdate = "UPDATE Valutazione SET n_stelle = ? WHERE id_valutazione = ?";
+        
+        try (PreparedStatement selectStmt = connection.prepareStatement(querySelect)) {
+            selectStmt.setInt(1, idContenuto);
+            selectStmt.setString(2, username);
+            
+            try (ResultSet rs = selectStmt.executeQuery()) {
+                if (rs.next()) {
+                    int idValutazione = rs.getInt("id_valutazione");
+                    try (PreparedStatement updateStmt = connection.prepareStatement(queryUpdate)) {
+                        updateStmt.setInt(1, rating);
+                        updateStmt.setInt(2, idValutazione);
+                        updateStmt.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement insertStmt = connection.prepareStatement(queryInsert)) {
+                        insertStmt.setInt(1, rating);
+                        insertStmt.setInt(2, idContenuto);
+                        insertStmt.setString(3, username);
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
+        }
+    }
+
+    // Metodo per ottenere la media dei voti per un contenuto
+    public double getAverageRating(int idContenuto) {
+        String sql = "SELECT AVG(n_stelle) AS average FROM Valutazione WHERE id_contenuto = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, idContenuto);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("average");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
 }
