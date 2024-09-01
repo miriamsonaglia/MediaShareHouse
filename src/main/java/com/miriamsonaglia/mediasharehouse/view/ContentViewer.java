@@ -84,7 +84,7 @@ public class ContentViewer {
                 displayer = new AudioDisplayer(contentFile);
                 break;
             case "movie":
-                displayer = new VideoDisplayer();
+                displayer = new VideoDisplayer(contentFile);
                 break;
             case "picture":
                 displayer = new ImageDisplayer(contentFile);
