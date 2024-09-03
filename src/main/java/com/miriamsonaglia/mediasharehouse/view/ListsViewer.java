@@ -54,19 +54,18 @@ public final class ListsViewer {
         panel.add(Box.createVerticalStrut(20));
 
         // Bottone 1
-        final CustomButton housesList = new CustomButton("CLASSIFICA CASE", customColor, customColor1, 1);
+        final CustomButton housesList = new CustomButton("UTENTI POPOLARI", customColor, customColor1, 1);
         housesList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Gestisci l'azione del bottone 1
-                System.out.println("Bottone 1 cliccato");
+                showTopCommentersPanel(frame, previousPanel, imagePath);
             }
         });
         panel.add(housesList);
         panel.add(Box.createVerticalStrut(10));
 
         // Bottone 2
-        final CustomButton usersList = new CustomButton("CLASSIFICA UTENTI", customColor, customColor1, 1);
+        final CustomButton usersList = new CustomButton("CLASSIFICA UTENTI-CASE", customColor, customColor1, 1);
         usersList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -100,6 +99,81 @@ public final class ListsViewer {
         panel.add(exitButton);
 
         return panel;
+    }
+
+    private void showTopCommentersPanel(JFrame existingFrame, JPanel previousPanel, String imagePath) {
+        // Creazione del pannello principale con layout verticale
+        JPanel topCommentersPanel = new JPanel() {
+            // Sovrascrivi il metodo paintComponent per disegnare lo sfondo
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                // Carica l'immagine di sfondo
+                ImageIcon backgroundIcon = new ImageIcon(imagePath);
+                Image backgroundImage = backgroundIcon.getImage();
+                // Disegna l'immagine di sfondo che riempie il pannello
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+    
+        topCommentersPanel.setLayout(new BoxLayout(topCommentersPanel, BoxLayout.Y_AXIS));
+        topCommentersPanel.setOpaque(false); // Rendi il pannello trasparente per mostrare lo sfondo
+    
+        // Colori personalizzati
+        final Color customColor = new Color(218, 165, 32);  // Colore oro
+        final Color customColor1 = new Color(101, 67, 33);  // Colore marrone
+    
+        // Titolo
+        JLabel titleLabel = new JLabel("Top Users by Number of Comments");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setFont(new Font("Monospaced", Font.BOLD, 30));
+        titleLabel.setForeground(Color.PINK);
+        topCommentersPanel.add(titleLabel);
+        topCommentersPanel.add(Box.createVerticalStrut(20));
+    
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            UtenteDAO utenteDao = new UtenteDAO(conn);
+            List<String> topUsers = utenteDao.getTopUsersByNumberOfComments(5);
+    
+            if (topUsers.isEmpty()) {
+                JLabel noUsersLabel = new JLabel("Nessun utente trovato.");
+                noUsersLabel.setForeground(Color.WHITE);
+                topCommentersPanel.add(noUsersLabel);
+            } else {
+                for (String user : topUsers) {
+                    JLabel userLabel = new JLabel(user);
+                    userLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    userLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+                    userLabel.setForeground(Color.WHITE);
+                    topCommentersPanel.add(userLabel);
+                }
+            }
+        } catch (SQLException e) {
+            JLabel errorLabel = new JLabel("Errore nella connessione al database.");
+            errorLabel.setForeground(Color.RED);
+            topCommentersPanel.add(errorLabel);
+            e.printStackTrace();
+        }
+    
+        // Pulsante per tornare al menu principale
+        final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(previousPanel);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        topCommentersPanel.add(Box.createVerticalStrut(20));
+        topCommentersPanel.add(backButton);
+    
+        // Aggiornamento della finestra
+        existingFrame.getContentPane().removeAll();
+        existingFrame.getContentPane().add(topCommentersPanel);
+        existingFrame.revalidate();
+        existingFrame.repaint();
     }
 
     private void showTopUsersPanel(JFrame existingFrame, JPanel previousPanel, String imagePath) {

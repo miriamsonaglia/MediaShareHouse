@@ -129,4 +129,28 @@ public class UtenteDAO {
             return false;
         }
     }
+
+    public List<String> getTopUsersByNumberOfComments(int limit) {
+        List<String> users = new ArrayList<>();
+        String sql = "SELECT u.username, COUNT(c.id_commento) AS num_commenti " +
+                     "FROM Utente u " +
+                     "JOIN Commento c ON u.username = c.username " +
+                     "GROUP BY u.username " +
+                     "ORDER BY num_commenti DESC " +
+                     "LIMIT ?";
+    
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(rs.getString("username") + " - Commenti: " + rs.getInt("num_commenti"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Errore durante il recupero degli utenti con il maggior numero di commenti: " + e.getMessage());
+        }
+    
+        return users;
+    }
+
 }
