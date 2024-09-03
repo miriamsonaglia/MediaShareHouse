@@ -4,6 +4,9 @@ package com.miriamsonaglia.mediasharehouse.view;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -48,6 +51,9 @@ public final class Room {
 
         roomPanel = createRoomPanel(imagePath);
         loadHouseRooms();
+
+        String chiaveStanza = currentHouse.getChiaveAccesso();
+        addRoomKeyLabel(chiaveStanza);
 
         frame.add(roomPanel);
         frame.revalidate();
@@ -125,6 +131,43 @@ public final class Room {
 
         return panel;
 
+    }
+
+    private void addRoomKeyLabel(String chiaveStanza) {
+        // Crea un pannello orizzontale per contenere la JLabel e il pulsante di copia
+        JPanel keyPanel = new JPanel();
+        keyPanel.setOpaque(false);  // Rendi il pannello trasparente
+        keyPanel.setLayout(new BoxLayout(keyPanel, BoxLayout.X_AXIS)); // Disposizione orizzontale
+        
+        // Crea la JLabel per visualizzare la chiave della stanza
+        JLabel keyLabel = new JLabel("Room Key: " + chiaveStanza);
+        keyLabel.setFont(new Font("Monospaced", Font.PLAIN, 20));
+        keyLabel.setForeground(Color.BLACK);
+        
+        // Crea il pulsante di copia
+        CustomButton copyButton = new CustomButton("Copy", Color.GREEN, Color.BLACK, 1);
+        copyButton.setFont(new Font("Monospaced", Font.PLAIN, 12)); // Font per uniformità
+        copyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Copia la chiave negli appunti
+                StringSelection stringSelection = new StringSelection(chiaveStanza);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, null);
+                
+                // Messaggio di conferma
+                JOptionPane.showMessageDialog(frame, "Room Key copied to clipboard!");
+            }
+        });
+        
+        // Aggiungi la JLabel e il pulsante al pannello
+        keyPanel.add(keyLabel);
+        keyPanel.add(Box.createHorizontalStrut(5)); // Spazio tra la label e il pulsante
+        keyPanel.add(copyButton);
+        
+        // Aggiungi il pannello principale al pannello della stanza
+        roomPanel.add(Box.createVerticalGlue());
+        roomPanel.add(keyPanel);
     }
 
     private void showDeleteRoomDialog() {
