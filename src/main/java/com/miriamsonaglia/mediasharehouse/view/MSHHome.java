@@ -27,6 +27,7 @@ import com.miriamsonaglia.mediasharehouse.model.Casa;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
 import com.miriamsonaglia.mediasharehouse.service.AccessManager;
 import com.miriamsonaglia.mediasharehouse.service.HouseManager;
+import com.miriamsonaglia.mediasharehouse.service.PublicHouseAccessManager;
 
 public final class MSHHome {
 
@@ -88,6 +89,17 @@ public final class MSHHome {
             }
         });
         panel.add(loginIntoHouse);
+        panel.add(Box.createVerticalStrut(10));
+
+        final CustomButton lookAtTheHouses = new CustomButton("VISUALIZZA CASA PUBBLICA", customColor, customColor1, 1);
+        lookAtTheHouses.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                PublicHouseAccessManager publicHouseAccessManager = new PublicHouseAccessManager(frame, currentUser);
+                publicHouseAccessManager.openPublicAccessFrame();
+            }
+        });
+        panel.add(lookAtTheHouses);
         panel.add(Box.createVerticalStrut(10));
 
         final CustomButton lookAtTheLists = new CustomButton("VISUALIZZA LE CLASSIFICHE", customColor, customColor1, 1);
