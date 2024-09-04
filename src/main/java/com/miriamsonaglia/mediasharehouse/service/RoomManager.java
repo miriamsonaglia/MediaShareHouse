@@ -1,5 +1,6 @@
 package com.miriamsonaglia.mediasharehouse.service;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -59,7 +60,6 @@ public class RoomManager {
                     boolean isCreated = stanzaDao.createStanza(newStanza);
                     int idNewStanza = newStanza.getIdStanza();
 
-
                     if (isCreated) {
                         JOptionPane.showMessageDialog(frame, "Stanza creata con successo!");
                         Room.addRoomButtonToPanel(roomName, idNewStanza);
@@ -74,53 +74,55 @@ public class RoomManager {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
         }
-
     }
 
-   public void deleteRoom(int idStanza) {
-    try (Connection connection = DatabaseConnection.getConnection()) {
-        connection.setAutoCommit(false);
+    public void deleteRoom(int idStanza) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            connection.setAutoCommit(false);
 
-        StanzaDao stanzaDao = new StanzaDao(connection);
-        ContenutoDao contenutoDao = new ContenutoDao(connection);
-        CommentoDao commentoDao = new CommentoDao(connection);
+            StanzaDao stanzaDao = new StanzaDao(connection);
+            ContenutoDao contenutoDao = new ContenutoDao(connection);
+            CommentoDao commentoDao = new CommentoDao(connection);
 
-        // Conferma l'eliminazione
-        int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa stanza e tutti i suoi contenuti e commenti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            // Ottieni tutti i contenuti della stanza
-            List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
+            // Conferma l'eliminazione
+            int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa stanza e tutti i suoi contenuti e commenti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                // Ottieni tutti i contenuti della stanza
+                List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
 
-            // Elimina i commenti e i contenuti
-            for (Contenuto contenuto : contenuti) {
-                // Ottieni e elimina tutti i commenti associati al contenuto
-                List<Commento> commenti = commentoDao.getCommentiByContenuto(contenuto.getIdContenuto());
-                for (Commento commento : commenti) {
-                    commentoDao.deleteCommento(commento.getIdCommento());
+                // Elimina i commenti e i contenuti
+                for (Contenuto contenuto : contenuti) {
+                    // Ottieni e elimina tutti i commenti associati al contenuto
+                    List<Commento> commenti = commentoDao.getCommentiByContenuto(contenuto.getIdContenuto());
+                    for (Commento commento : commenti) {
+                        commentoDao.deleteCommento(commento.getIdCommento());
+                    }
+
+                    // Elimina il file associato al contenuto
+                    String percorsoFile = contenutoDao.getFilePathFromDatabase(contenuto.getIdContenuto());
+                    deleteFileFromSystem(percorsoFile);
+
+                    // Elimina il contenuto
+                    contenutoDao.deleteContenuto(contenuto.getIdContenuto());
                 }
 
-                // Elimina il contenuto
-                contenutoDao.deleteContenuto(contenuto.getIdContenuto());
-            }
+                // Elimina la stanza
+                boolean isDeleted = stanzaDao.deleteStanza(idStanza);
 
-            // Elimina la stanza
-            boolean isDeleted = stanzaDao.deleteStanza(idStanza);
-
-            if (isDeleted) {
-                connection.commit();
-                JOptionPane.showMessageDialog(frame, "Stanza eliminata con successo.");
-                Room.removeRoomButtonFromPanel(idStanza);
+                if (isDeleted) {
+                    connection.commit();
+                    JOptionPane.showMessageDialog(frame, "Stanza eliminata con successo.");
+                    Room.removeRoomButtonFromPanel(idStanza);
+                } else {
+                    connection.rollback();
+                    JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della stanza.");
+                }
             } else {
                 connection.rollback();
-                JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione della stanza.");
             }
-        } else {
-            connection.rollback();
-        }
         } catch (SQLException ex) {
             ex.printStackTrace();
             try {
-                // Rollback in caso di errore
                 DatabaseConnection.getConnection().rollback();
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();
@@ -129,5 +131,19 @@ public class RoomManager {
         }
     }
 
-    
+    // Metodo per eliminare un file dal sistema
+    private void deleteFileFromSystem(String filePath) {
+        if (filePath != null && !filePath.isEmpty()) {
+            File file = new File(filePath);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("File eliminato: " + filePath);
+                } else {
+                    System.out.println("Errore nell'eliminazione del file: " + filePath);
+                }
+            } else {
+                System.out.println("File non trovato: " + filePath);
+            }
+        }
+    }
 }

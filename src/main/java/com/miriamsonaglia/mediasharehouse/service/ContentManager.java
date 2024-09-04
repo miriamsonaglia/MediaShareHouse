@@ -1,5 +1,6 @@
 package com.miriamsonaglia.mediasharehouse.service;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -90,6 +91,21 @@ public class ContentManager {
         // Conferma l'eliminazione
         int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questo contenuto e tutti i suoi commenti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
+            // Ottieni il percorso del file associato al contenuto
+            String percorsoFile = contenutoDao.getFilePathFromDatabase(idContenuto);
+            
+            if (percorsoFile != null && !percorsoFile.isEmpty()) {
+                // Elimina fisicamente il file dal filesystem
+                File file = new File(percorsoFile);
+                if (file.exists()) {
+                    if (!file.delete()) {
+                        JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione del file dal filesystem.");
+                        connection.rollback();  // Rollback in caso di errore
+                        return;
+                    }
+                }
+            }
+
             // Ottieni tutti i commenti associati al contenuto
             List<Commento> commenti = commentoDao.getCommentiByContenuto(idContenuto);
 
@@ -111,16 +127,16 @@ public class ContentManager {
         } else {
             connection.rollback();  // Annulla la transazione se l'utente annulla
         }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            try {
-                // Rollback in caso di errore
-                DatabaseConnection.getConnection().rollback();
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
-            }
-            JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        try {
+            // Rollback in caso di errore
+            DatabaseConnection.getConnection().rollback();
+        } catch (SQLException rollbackEx) {
+            rollbackEx.printStackTrace();
         }
+        JOptionPane.showMessageDialog(frame, "Errore nella connessione al database.");
     }
+}
 
 }

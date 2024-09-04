@@ -1,5 +1,6 @@
 package com.miriamsonaglia.mediasharehouse.service;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -141,6 +142,11 @@ public class HouseManager {
                     for (Commento commento : commenti) {
                         commentoDao.deleteCommento(commento.getIdCommento());
                     }
+
+                    // Elimina il file associato al contenuto
+                    String percorsoFile = contenutoDao.getFilePathFromDatabase(contenuto.getIdContenuto());
+                    deleteFileFromSystem(percorsoFile);
+
                     // Elimina il contenuto
                     contenutoDao.deleteContenuto(contenuto.getIdContenuto());
                 }
@@ -200,4 +206,21 @@ public class HouseManager {
         // Logica per generare una chiave unica per la casa
         return "unique-key-" + System.currentTimeMillis();  // Esempio semplice
     }
+
+    // Metodo per eliminare un file dal sistema
+    private void deleteFileFromSystem(String filePath) {
+        if (filePath != null && !filePath.isEmpty()) {
+            File file = new File(filePath);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("File eliminato: " + filePath);
+                } else {
+                    System.out.println("Errore nell'eliminazione del file: " + filePath);
+                }
+            } else {
+                System.out.println("File non trovato: " + filePath);
+            }
+        }
+    }
+
 }

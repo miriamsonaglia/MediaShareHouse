@@ -112,55 +112,55 @@ public final class ListsViewer {
     }
 
     private void showTopHousesPanel(JFrame existingFrame, JPanel previousPanel, String imagePath) {
-    // Crea il pannello principale con layout verticale
-    JPanel topCasePanel = new JPanel() {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            ImageIcon backgroundIcon = new ImageIcon(imagePath);
-            Image backgroundImage = backgroundIcon.getImage();
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-        }
-    };
-
-    topCasePanel.setLayout(new BoxLayout(topCasePanel, BoxLayout.Y_AXIS));
-    topCasePanel.setOpaque(false);
-
-    // Colori personalizzati
-    final Color customColor = new Color(218, 165, 32);
-    final Color customColor1 = new Color(101, 67, 33);
-
-    // Titolo
-    JLabel titleLabel = new JLabel("Top 10 Case Popolari");
-    titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-    titleLabel.setFont(new Font("Monospaced", Font.BOLD, 30));
-    titleLabel.setForeground(Color.PINK);
-    topCasePanel.add(titleLabel);
-    topCasePanel.add(Box.createVerticalStrut(20));
-
-    try (Connection conn = DatabaseConnection.getConnection()) {
-        CasaDao casaDao = new CasaDao(conn);
-        List<Casa> topCase = casaDao.getTopCaseByContenuti(10);
-
-        if (topCase.isEmpty()) {
-            JLabel noCaseLabel = new JLabel("Nessuna casa trovata.");
-            noCaseLabel.setForeground(Color.WHITE);
-            topCasePanel.add(noCaseLabel);
-        } else {
-            for (Casa casa : topCase) {
-                JLabel casaLabel = new JLabel(casa.getNome() + " - Proprietario: " + casa.getUsername());
-                casaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                casaLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-                casaLabel.setForeground(Color.WHITE);
-                topCasePanel.add(casaLabel);
+        // Crea il pannello principale con layout verticale
+        JPanel topCasePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon backgroundIcon = new ImageIcon(imagePath);
+                Image backgroundImage = backgroundIcon.getImage();
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
             }
+        };
+
+        topCasePanel.setLayout(new BoxLayout(topCasePanel, BoxLayout.Y_AXIS));
+        topCasePanel.setOpaque(false);
+
+        // Colori personalizzati
+        final Color customColor = new Color(218, 165, 32);
+        final Color customColor1 = new Color(101, 67, 33);
+
+        // Titolo
+        JLabel titleLabel = new JLabel("Top 10 Case Popolari");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setFont(new Font("Monospaced", Font.BOLD, 30));
+        titleLabel.setForeground(Color.PINK);
+        topCasePanel.add(titleLabel);
+        topCasePanel.add(Box.createVerticalStrut(20));
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            CasaDao casaDao = new CasaDao(conn);
+            List<Casa> topCase = casaDao.getTopCaseByContenuti(10);
+
+            if (topCase.isEmpty()) {
+                JLabel noCaseLabel = new JLabel("Nessuna casa trovata.");
+                noCaseLabel.setForeground(Color.WHITE);
+                topCasePanel.add(noCaseLabel);
+            } else {
+                for (Casa casa : topCase) {
+                    JLabel casaLabel = new JLabel(casa.getNome() + " - Proprietario: " + casa.getUsername());
+                    casaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    casaLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+                    casaLabel.setForeground(Color.WHITE);
+                    topCasePanel.add(casaLabel);
+                }
+            }
+        } catch (SQLException e) {
+            JLabel errorLabel = new JLabel("Errore nella connessione al database.");
+            errorLabel.setForeground(Color.RED);
+            topCasePanel.add(errorLabel);
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        JLabel errorLabel = new JLabel("Errore nella connessione al database.");
-        errorLabel.setForeground(Color.RED);
-        topCasePanel.add(errorLabel);
-        e.printStackTrace();
-    }
 
         /// Pulsante per tornare al menu principale
         final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
