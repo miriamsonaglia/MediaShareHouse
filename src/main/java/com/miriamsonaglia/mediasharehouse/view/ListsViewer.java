@@ -18,8 +18,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.UtenteDAO;
+import com.miriamsonaglia.mediasharehouse.model.Casa;
 
 public final class ListsViewer {
     private static JFrame frame;
@@ -53,18 +55,26 @@ public final class ListsViewer {
         panel.add(titleLabel);
         panel.add(Box.createVerticalStrut(20));
 
-        // Bottone 1
-        final CustomButton housesList = new CustomButton("UTENTI POPOLARI", customColor, customColor1, 1);
+        final CustomButton housesList = new CustomButton("CASE POPOLARI", customColor, customColor1, 1);
         housesList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showTopCommentersPanel(frame, previousPanel, imagePath);
+                showTopHousesPanel(frame, listsPanel, imagePath);
             }
         });
         panel.add(housesList);
         panel.add(Box.createVerticalStrut(10));
 
-        // Bottone 2
+        final CustomButton popularList = new CustomButton("UTENTI POPOLARI", customColor, customColor1, 1);
+        popularList.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showTopCommentersPanel(frame, listsPanel, imagePath);
+            }
+        });
+        panel.add(popularList);
+        panel.add(Box.createVerticalStrut(10));
+
         final CustomButton usersList = new CustomButton("CLASSIFICA UTENTI-CASE", customColor, customColor1, 1);
         usersList.addActionListener(new ActionListener() {
             @Override
@@ -99,6 +109,78 @@ public final class ListsViewer {
         panel.add(exitButton);
 
         return panel;
+    }
+
+    private void showTopHousesPanel(JFrame existingFrame, JPanel previousPanel, String imagePath) {
+    // Crea il pannello principale con layout verticale
+    JPanel topCasePanel = new JPanel() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            ImageIcon backgroundIcon = new ImageIcon(imagePath);
+            Image backgroundImage = backgroundIcon.getImage();
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    };
+
+    topCasePanel.setLayout(new BoxLayout(topCasePanel, BoxLayout.Y_AXIS));
+    topCasePanel.setOpaque(false);
+
+    // Colori personalizzati
+    final Color customColor = new Color(218, 165, 32);
+    final Color customColor1 = new Color(101, 67, 33);
+
+    // Titolo
+    JLabel titleLabel = new JLabel("Top 10 Case Popolari");
+    titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    titleLabel.setFont(new Font("Monospaced", Font.BOLD, 30));
+    titleLabel.setForeground(Color.PINK);
+    topCasePanel.add(titleLabel);
+    topCasePanel.add(Box.createVerticalStrut(20));
+
+    try (Connection conn = DatabaseConnection.getConnection()) {
+        CasaDao casaDao = new CasaDao(conn);
+        List<Casa> topCase = casaDao.getTopCaseByContenuti(10);
+
+        if (topCase.isEmpty()) {
+            JLabel noCaseLabel = new JLabel("Nessuna casa trovata.");
+            noCaseLabel.setForeground(Color.WHITE);
+            topCasePanel.add(noCaseLabel);
+        } else {
+            for (Casa casa : topCase) {
+                JLabel casaLabel = new JLabel(casa.getNome() + " - Proprietario: " + casa.getUsername());
+                casaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                casaLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+                casaLabel.setForeground(Color.WHITE);
+                topCasePanel.add(casaLabel);
+            }
+        }
+    } catch (SQLException e) {
+        JLabel errorLabel = new JLabel("Errore nella connessione al database.");
+        errorLabel.setForeground(Color.RED);
+        topCasePanel.add(errorLabel);
+        e.printStackTrace();
+    }
+
+        /// Pulsante per tornare al menu principale
+        final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(previousPanel);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        topCasePanel.add(Box.createVerticalStrut(20));
+        topCasePanel.add(backButton);
+
+        // Aggiornamento della finestra
+        existingFrame.getContentPane().removeAll();
+        existingFrame.getContentPane().add(topCasePanel);
+        existingFrame.revalidate();
+        existingFrame.repaint();
     }
 
     private void showTopCommentersPanel(JFrame existingFrame, JPanel previousPanel, String imagePath) {
@@ -155,19 +237,19 @@ public final class ListsViewer {
             e.printStackTrace();
         }
     
-        // Pulsante per tornare al menu principale
-        final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                frame.getContentPane().removeAll();
-                frame.getContentPane().add(previousPanel);
-                frame.revalidate();
-                frame.repaint();
-            }
-        });
-        topCommentersPanel.add(Box.createVerticalStrut(20));
-        topCommentersPanel.add(backButton);
+       // Pulsante per tornare al menu principale
+       final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
+       backButton.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(final ActionEvent e) {
+               frame.getContentPane().removeAll();
+               frame.getContentPane().add(previousPanel);
+               frame.revalidate();
+               frame.repaint();
+           }
+       });
+       topCommentersPanel.add(Box.createVerticalStrut(20));
+       topCommentersPanel.add(backButton);
     
         // Aggiornamento della finestra
         existingFrame.getContentPane().removeAll();
@@ -230,26 +312,26 @@ public final class ListsViewer {
             e.printStackTrace();
         }
 
-    // Pulsante per tornare al menu principale
-    final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
-    backButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            frame.getContentPane().removeAll();
-            frame.getContentPane().add(previousPanel);
-            frame.revalidate();
-            frame.repaint();
-        }
-    });
-    topUsersPanel.add(Box.createVerticalStrut(20));
-    topUsersPanel.add(backButton);
+        // Pulsante per tornare al menu principale
+        final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(previousPanel);
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        topUsersPanel.add(Box.createVerticalStrut(20));
+        topUsersPanel.add(backButton);
 
-    // Aggiornamento della finestra
-    existingFrame.getContentPane().removeAll();
-    existingFrame.getContentPane().add(topUsersPanel);
-    existingFrame.revalidate();
-    existingFrame.repaint();
-}
+        // Aggiornamento della finestra
+        existingFrame.getContentPane().removeAll();
+        existingFrame.getContentPane().add(topUsersPanel);
+        existingFrame.revalidate();
+        existingFrame.repaint();
+    }
 
 
     private void closeWindow() {

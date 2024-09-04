@@ -238,4 +238,58 @@ public class CasaDao {
         }
         return null;
     }
+
+    public List<String> getTopCaseWithMostContents(int limit) {
+        List<String> caseList = new ArrayList<>();
+        String sql = "SELECT Casa.nome, Casa.username, COUNT(Contenuto.id_contenuto) AS num_contenuti " +
+                     "FROM Casa " +
+                     "LEFT JOIN Stanza ON Casa.id_casa = Stanza.id_casa " +
+                     "LEFT JOIN Contenuto ON Stanza.id_stanza = Contenuto.id_stanza " +
+                     "GROUP BY Casa.id_casa " +
+                     "ORDER BY num_contenuti DESC " +
+                     "LIMIT ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String casaInfo = rs.getString("nome") + " - Utente: " + rs.getString("username") +
+                                      " (Contenuti: " + rs.getInt("num_contenuti") + ")";
+                    caseList.add(casaInfo);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return caseList;
+    }
+
+    public List<Casa> getTopCaseByContenuti(int limit) {
+        List<Casa> caseList = new ArrayList<>();
+        String sql = "SELECT Casa.*, COUNT(Contenuto.id_contenuto) AS num_contenuti " +
+                     "FROM Casa " +
+                     "JOIN Stanza ON Casa.id_casa = Stanza.id_casa " +
+                     "JOIN Contenuto ON Stanza.id_stanza = Contenuto.id_stanza " +
+                     "GROUP BY Casa.id_casa " +
+                     "ORDER BY num_contenuti DESC " +
+                     "LIMIT ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Casa casa = new Casa(
+                        rs.getInt("id_casa"),
+                        rs.getString("nome"),
+                        rs.getString("chiave_accesso"),
+                        rs.getString("stato"),
+                        rs.getString("username")
+                    );
+                    caseList.add(casa);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return caseList;
+    }
+
 }
