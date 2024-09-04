@@ -95,7 +95,7 @@ public final class MSHHome {
         lookAtTheHouses.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                PublicHouseAccessManager publicHouseAccessManager = new PublicHouseAccessManager(frame, currentUser);
+                PublicHouseAccessManager publicHouseAccessManager = new PublicHouseAccessManager(frame, currentUser, homePanel, imagePath);
                 publicHouseAccessManager.openPublicAccessFrame();
             }
         });
