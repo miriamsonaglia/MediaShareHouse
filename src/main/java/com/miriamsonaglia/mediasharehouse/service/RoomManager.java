@@ -18,6 +18,7 @@ import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
 import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
+import com.miriamsonaglia.mediasharehouse.dao.ValutazioneDao;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
 import com.miriamsonaglia.mediasharehouse.model.Commento;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
@@ -83,6 +84,7 @@ public class RoomManager {
             StanzaDao stanzaDao = new StanzaDao(connection);
             ContenutoDao contenutoDao = new ContenutoDao(connection);
             CommentoDao commentoDao = new CommentoDao(connection);
+            ValutazioneDao valutazioneDao = new ValutazioneDao(connection);
 
             // Conferma l'eliminazione
             int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa stanza e tutti i suoi contenuti e commenti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
@@ -90,8 +92,12 @@ public class RoomManager {
                 // Ottieni tutti i contenuti della stanza
                 List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(idStanza);
 
-                // Elimina i commenti e i contenuti
+                // Elimina i commenti e i contenuti e le valutazioni
                 for (Contenuto contenuto : contenuti) {
+
+                    // Elimina le valutazioni associate al contenuto
+                    valutazioneDao.deleteValutazioniByContenuto(contenuto.getIdContenuto());
+
                     // Ottieni e elimina tutti i commenti associati al contenuto
                     List<Commento> commenti = commentoDao.getCommentiByContenuto(contenuto.getIdContenuto());
                     for (Commento commento : commenti) {

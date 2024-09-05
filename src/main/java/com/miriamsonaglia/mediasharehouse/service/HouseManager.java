@@ -20,6 +20,7 @@ import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
 import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.StanzaDao;
+import com.miriamsonaglia.mediasharehouse.dao.ValutazioneDao;
 import com.miriamsonaglia.mediasharehouse.model.Accesso;
 import com.miriamsonaglia.mediasharehouse.model.Casa;
 import com.miriamsonaglia.mediasharehouse.model.Commento;
@@ -126,6 +127,7 @@ public class HouseManager {
         ContenutoDao contenutoDao = new ContenutoDao(connection);
         CommentoDao commentoDao = new CommentoDao(connection);
         AccessoDao accessoDao = new AccessoDao(connection);
+        ValutazioneDao valutazioneDao = new ValutazioneDao(connection);
 
         // Conferma l'eliminazione
         int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questa casa e tutte le sue stanze, contenuti, commenti e accessi?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
@@ -137,6 +139,10 @@ public class HouseManager {
             for (Stanza stanza : stanze) {
                 List<Contenuto> contenuti = contenutoDao.getContenutiByStanza(stanza.getIdStanza());
                 for (Contenuto contenuto : contenuti) {
+
+                    // Elimina le valutazioni associate al contenuto
+                    valutazioneDao.deleteValutazioniByContenuto(contenuto.getIdContenuto());
+
                     // Elimina i commenti di ogni contenuto
                     List<Commento> commenti = commentoDao.getCommentiByContenuto(contenuto.getIdContenuto());
                     for (Commento commento : commenti) {

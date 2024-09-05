@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import com.miriamsonaglia.mediasharehouse.dao.CommentoDao;
 import com.miriamsonaglia.mediasharehouse.dao.ContenutoDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
+import com.miriamsonaglia.mediasharehouse.dao.ValutazioneDao;
 import com.miriamsonaglia.mediasharehouse.model.Commento;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
@@ -87,6 +88,7 @@ public class ContentManager {
 
         ContenutoDao contenutoDao = new ContenutoDao(connection);
         CommentoDao commentoDao = new CommentoDao(connection);
+        ValutazioneDao valutazioneDao = new ValutazioneDao(connection);
 
         // Conferma l'eliminazione
         int confirm = JOptionPane.showConfirmDialog(frame, "Sei sicuro di voler eliminare questo contenuto e tutti i suoi commenti?", "Conferma eliminazione", JOptionPane.YES_NO_OPTION);
@@ -105,6 +107,14 @@ public class ContentManager {
                     }
                 }
             }
+
+            // Elimina tutte le valutazioni del contenuto
+            if (!valutazioneDao.deleteValutazioniByContenuto(idContenuto)) {
+                JOptionPane.showMessageDialog(frame, "Errore durante l'eliminazione delle valutazioni.");
+                connection.rollback();  // Rollback in caso di errore
+                return;
+            }
+
 
             // Ottieni tutti i commenti associati al contenuto
             List<Commento> commenti = commentoDao.getCommentiByContenuto(idContenuto);
