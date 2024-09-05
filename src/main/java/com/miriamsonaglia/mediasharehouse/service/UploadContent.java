@@ -23,6 +23,7 @@ import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.model.Contenuto;
 import com.miriamsonaglia.mediasharehouse.model.Stanza;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
+import com.miriamsonaglia.mediasharehouse.view.Content;
 
 public class UploadContent {
 
@@ -90,6 +91,7 @@ public class UploadContent {
                                 Files.copy(selectedFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
                                 JOptionPane.showMessageDialog(frame, "File caricato con successo in: " + destinationPath.toString());
+                                Content.addContentButtonToPanel(fileType, percorsoFile, contentName, idContenuto);
                             } else {
                                 JOptionPane.showMessageDialog(frame, "Errore durante l'inserimento del contenuto nel database.");
                             }
