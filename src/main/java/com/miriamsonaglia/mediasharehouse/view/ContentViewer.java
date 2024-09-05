@@ -103,10 +103,12 @@ public class ContentViewer {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.setPreferredSize(new Dimension(frame.getWidth() / 2, frame.getHeight()));
+        panel.setBackground(Color.CYAN); // Imposta lo sfondo ciano per l'intero pannello
     
         // Pannello che conterrà tutti i messaggi
         JPanel chatPanel = new JPanel();
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+        chatPanel.setBackground(Color.CYAN); // Imposta lo sfondo ciano per il pannello dei messaggi
     
         // Pannello per i messaggi che sarà inserito nello scrollPane
         JPanel chatContainer = new JPanel(new BorderLayout());
@@ -148,6 +150,7 @@ public class ContentViewer {
                 // Pannello orizzontale per ogni messaggio e il pulsante "Rispondi"
                 JPanel messagePanel = new JPanel();
                 messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.X_AXIS));
+                messagePanel.setBackground(Color.CYAN); // Imposta lo sfondo ciano per il pannello del messaggio
     
                 // Etichetta del messaggio
                 JLabel messageLabel = new JLabel(commento.getUsername() + ": " + commento.getTesto());
@@ -158,7 +161,7 @@ public class ContentViewer {
                 replyButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        inputArea.setText("@" + commento.getUsername() + " ");
+                        //inputArea.setText("@" + commento.getUsername() + " ");
                         selectedCommentoPadre[0] = commento;
                     }
                 });
@@ -194,16 +197,17 @@ public class ContentViewer {
                         // Aggiungi il nuovo messaggio alla chat
                         JPanel newMessagePanel = new JPanel();
                         newMessagePanel.setLayout(new BoxLayout(newMessagePanel, BoxLayout.X_AXIS));
+                        newMessagePanel.setBackground(Color.CYAN); // Imposta lo sfondo ciano per il nuovo pannello del messaggio
     
                         // Se c'è un messaggio padre, visualizzalo
                         if (selectedCommentoPadre[0] != null) {
-                            JLabel parentMessageLabel = new JLabel("In risposta a " + selectedCommentoPadre[0].getUsername() + ": " + selectedCommentoPadre[0].getTesto());
+                            JLabel parentMessageLabel = new JLabel("In risposta a " + ": " + selectedCommentoPadre[0].getTesto() + " ");
                             parentMessageLabel.setFont(parentMessageLabel.getFont().deriveFont(Font.ITALIC)); // Opzionale: stile in corsivo
                             newMessagePanel.add(parentMessageLabel);
                         }
     
                         // Messaggio dell'utente corrente
-                        JLabel newMessageLabel = new JLabel(commento.getUsername() + ":" + message);
+                        JLabel newMessageLabel = new JLabel(commento.getUsername() + ": " + message);
                         newMessagePanel.add(newMessageLabel);
     
                         // Pulsante "Rispondi" per il nuovo messaggio
