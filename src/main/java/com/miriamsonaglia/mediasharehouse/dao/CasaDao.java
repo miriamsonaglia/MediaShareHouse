@@ -245,9 +245,11 @@ public class CasaDao {
                      "FROM Casa " +
                      "LEFT JOIN Stanza ON Casa.id_casa = Stanza.id_casa " +
                      "LEFT JOIN Contenuto ON Stanza.id_stanza = Contenuto.id_stanza " +
+                     "WHERE Casa.stato = 'pubblica' " +  // Filtra solo le case pubbliche
                      "GROUP BY Casa.id_casa " +
                      "ORDER BY num_contenuti DESC " +
                      "LIMIT ?";
+    
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, limit);
             try (ResultSet rs = pstmt.executeQuery()) {

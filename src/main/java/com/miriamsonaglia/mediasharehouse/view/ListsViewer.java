@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.dao.UtenteDAO;
-import com.miriamsonaglia.mediasharehouse.model.Casa;
 
 public final class ListsViewer {
     private static JFrame frame;
@@ -122,14 +121,14 @@ public final class ListsViewer {
                 g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
             }
         };
-
+    
         topCasePanel.setLayout(new BoxLayout(topCasePanel, BoxLayout.Y_AXIS));
         topCasePanel.setOpaque(false);
-
+    
         // Colori personalizzati
         final Color customColor = new Color(218, 165, 32);
         final Color customColor1 = new Color(101, 67, 33);
-
+    
         // Titolo
         JLabel titleLabel = new JLabel("Top 10 Case Popolari");
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -137,18 +136,20 @@ public final class ListsViewer {
         titleLabel.setForeground(Color.PINK);
         topCasePanel.add(titleLabel);
         topCasePanel.add(Box.createVerticalStrut(20));
-
+    
         try (Connection conn = DatabaseConnection.getConnection()) {
             CasaDao casaDao = new CasaDao(conn);
-            List<Casa> topCase = casaDao.getTopCaseByContenuti(10);
-
+            // Usa il metodo getTopCaseWithMostContents per ottenere la lista delle case
+            List<String> topCase = casaDao.getTopCaseWithMostContents(10);
+    
             if (topCase.isEmpty()) {
                 JLabel noCaseLabel = new JLabel("Nessuna casa trovata.");
                 noCaseLabel.setForeground(Color.WHITE);
                 topCasePanel.add(noCaseLabel);
             } else {
-                for (Casa casa : topCase) {
-                    JLabel casaLabel = new JLabel(casa.getNome() + " - Proprietario: " + casa.getUsername());
+                // Cicla attraverso la lista delle case per mostrare nome della casa e username del proprietario
+                for (String casaInfo : topCase) {
+                    JLabel casaLabel = new JLabel(casaInfo); // Visualizza direttamente la stringa formattata
                     casaLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                     casaLabel.setFont(new Font("Arial", Font.PLAIN, 20));
                     casaLabel.setForeground(Color.WHITE);
@@ -161,21 +162,21 @@ public final class ListsViewer {
             topCasePanel.add(errorLabel);
             e.printStackTrace();
         }
-
-        /// Pulsante per tornare al menu principale
+    
+        // Pulsante per tornare al menu principale
         final CustomButton backButton = new CustomButton("INDIETRO", customColor, customColor1, 1);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                frame.getContentPane().removeAll();
-                frame.getContentPane().add(previousPanel);
-                frame.revalidate();
-                frame.repaint();
+                existingFrame.getContentPane().removeAll();
+                existingFrame.getContentPane().add(previousPanel);
+                existingFrame.revalidate();
+                existingFrame.repaint();
             }
         });
         topCasePanel.add(Box.createVerticalStrut(20));
         topCasePanel.add(backButton);
-
+    
         // Aggiornamento della finestra
         existingFrame.getContentPane().removeAll();
         existingFrame.getContentPane().add(topCasePanel);
