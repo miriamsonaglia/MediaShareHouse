@@ -65,8 +65,8 @@ public class ContentViewer {
         chatPanel = createChatPanel();
 
         // Aggiunge i pannelli al frame
-        frame.add(contentPanel, BorderLayout.CENTER);
-        frame.add(chatPanel, BorderLayout.EAST);
+        //frame.add(contentPanel, BorderLayout.CENTER);
+        frame.add(chatPanel);
 
         // Crea il pannello di valutazione e aggiungilo in alto (NORTH) nel frame
         JPanel ratingPanel = createRatingPanel();
