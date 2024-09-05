@@ -110,17 +110,17 @@ public class ValutazioneDao {
         return false;
     }
 
-    // Metodo per eliminare tutte le valutazioni di un contenuto
     public boolean deleteValutazioniByContenuto(int idContenuto) {
         String sql = "DELETE FROM Valutazione WHERE id_contenuto = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, idContenuto);
             int affectedRows = pstmt.executeUpdate();
-            return affectedRows > 0;
+            // Restituisce true anche se affectedRows è 0, perché significa che non c'erano righe da eliminare, non un errore.
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;  // Restituisce false solo in caso di errore SQL
         }
-        return false;
     }
 
     public void createValutazione(int idContenuto, int nStelle) throws SQLException {

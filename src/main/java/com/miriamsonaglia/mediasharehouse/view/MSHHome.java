@@ -200,10 +200,6 @@ public final class MSHHome {
             List<Integer> userHousesID = accessoDao.getIdCaseByUsername(currentUser.getUsername());
             List<Casa> userHouses = casaDao.getCaseByIdList(userHousesID);
 
-
-        
-
-
             // List<Casa> userHouses = casaDao.getCaseByUser(currentUser.getUsername());
     
             if (userHouses.isEmpty()) {
@@ -224,7 +220,7 @@ public final class MSHHome {
                 if (selectedCasa != null) {
                     HouseManager houseManager = new HouseManager(frame, currentUser);
                     houseManager.searchAndDeleteHouse(selectedCasa.getIdCasa());
-                    removeHouseButtonFromPanel(selectedCasa.getIdCasa());
+                    //removeHouseButtonFromPanel(selectedCasa.getIdCasa());
                 }
             }
         } catch (SQLException ex) {
