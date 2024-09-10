@@ -136,5 +136,35 @@ public class CommentoDao {
         return false;
     }
     
+    // Metodo per ottenere l'id del commento padre dato l'id di un commento
+    public Integer getParentCommentId(int commentId) {
+        String sql = "SELECT id_commento_padre FROM Commento WHERE id_commento = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, commentId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id_commento_padre");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
+    // Metodo per ottenere il testo di un Commento dato il suo ID
+    public String getCommentTextById(int idCommento) {
+        String sql = "SELECT testo FROM Commento WHERE id_commento = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, idCommento);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("testo");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

@@ -139,6 +139,8 @@ public final class MSHHome {
                             
                             if (isUpdated) {
                                 JOptionPane.showMessageDialog(frame, "Congratulazioni! Sei passato a MSH Premium.");
+                                premiumButton.setEnabled(false); // Disabilita il pulsante dopo l'aggiornamento
+                                
                             } else {
                                 JOptionPane.showMessageDialog(frame, "Si è verificato un errore durante l'aggiornamento dell'abbonamento.");
                             }

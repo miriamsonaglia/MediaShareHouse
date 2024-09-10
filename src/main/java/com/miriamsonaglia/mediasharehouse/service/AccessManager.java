@@ -18,6 +18,7 @@ import com.miriamsonaglia.mediasharehouse.dao.CasaDao;
 import com.miriamsonaglia.mediasharehouse.dao.DatabaseConnection;
 import com.miriamsonaglia.mediasharehouse.model.Accesso;
 import com.miriamsonaglia.mediasharehouse.model.Utente;
+import com.miriamsonaglia.mediasharehouse.view.MSHHome;
 
 public class AccessManager {
 
@@ -51,10 +52,6 @@ public class AccessManager {
             if (!houseName.isEmpty() && !houseKey.isEmpty()) {
                 boolean accessGranted = verifyAccess(houseName, houseKey);
                 if (accessGranted) {
-                    JOptionPane.showMessageDialog(frame, "Accesso concesso!");
-
-                    
-
 
                     try (Connection connection = DatabaseConnection.getConnection()) {
                         CasaDao casaDao = new CasaDao(connection);
@@ -62,6 +59,12 @@ public class AccessManager {
                         int IdCasa=casaDao.getCasaIdByNomeAndChiave(houseName, houseKey);
                         Accesso accesso = new Accesso(0, currentUser.getUsername(), IdCasa);
                         accessoDao.createAccesso(accesso);
+
+                        // Aggiungo la casa alla lista delle case dell'utente
+                        
+                        MSHHome.addHouseButtonToPanel(houseName, IdCasa);
+                        JOptionPane.showMessageDialog(frame, "Accesso concesso!");
+
 
                     } catch (SQLException ex) {
                         ex.printStackTrace();

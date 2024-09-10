@@ -74,6 +74,12 @@ public class HouseManager {
                 String houseState = (String) stateComboBox.getSelectedItem();
 
                 if (!houseName.isEmpty()) {
+                    
+                    if (casaDao.isCasaAssociatedWithUser(houseName, currentUser.getUsername())) {
+                        JOptionPane.showMessageDialog(frame, "Hai già una casa con questo nome.");
+                        return;
+                    }
+                    
                     // Creazione di un nuovo oggetto Casa
                     Casa newCasa = new Casa(0, houseName, generateUniqueAccessKey(), houseState, currentUser.getUsername());
                     
@@ -198,6 +204,7 @@ public class HouseManager {
 
             if (isRemoved) {
                 JOptionPane.showMessageDialog(frame, "Accesso alla casa rimosso con successo.");
+                MSHHome.removeHouseButtonFromPanel(idCasa);
             } else {
                 JOptionPane.showMessageDialog(frame, "Errore durante la rimozione dell'accesso alla casa.");
             }

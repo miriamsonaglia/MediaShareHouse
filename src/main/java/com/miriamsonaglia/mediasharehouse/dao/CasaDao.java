@@ -294,4 +294,22 @@ public class CasaDao {
         return caseList;
     }
 
+    // Metodo per verificare se una Casa è associata a un determinato utente nel database
+    public boolean isCasaAssociatedWithUser(String nomeCasa, String username) {
+        String sql = "SELECT COUNT(*) FROM Casa WHERE nome = ? AND username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, nomeCasa);
+            pstmt.setString(2, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

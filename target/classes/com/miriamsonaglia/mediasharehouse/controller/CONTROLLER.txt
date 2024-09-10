@@ -1,2 +1,0 @@
-CONTROLLER
-Gestisce le RICHIESTE degli utenti e COORDINA tra i vari componenti

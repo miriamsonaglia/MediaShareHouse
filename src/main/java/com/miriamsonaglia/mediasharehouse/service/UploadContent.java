@@ -90,7 +90,7 @@ public class UploadContent {
                                 Path destinationPath = getDestinationPath(newFileName);
                                 Files.copy(selectedFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
-                                JOptionPane.showMessageDialog(frame, "File caricato con successo in: " + destinationPath.toString());
+                                JOptionPane.showMessageDialog(frame, "File caricato con successo!");
                                 Content.addContentButtonToPanel(fileType, percorsoFile, contentName, idContenuto);
                             } else {
                                 JOptionPane.showMessageDialog(frame, "Errore durante l'inserimento del contenuto nel database.");

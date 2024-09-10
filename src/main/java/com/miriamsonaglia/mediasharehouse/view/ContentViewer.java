@@ -153,9 +153,33 @@ public class ContentViewer {
                 messagePanel.setBackground(Color.CYAN); // Imposta lo sfondo ciano per il pannello del messaggio
     
                 // Etichetta del messaggio
-                JLabel messageLabel = new JLabel(commento.getUsername() + ": " + commento.getTesto());
-                messagePanel.add(messageLabel);
+                int idCommento = commento.getIdCommento();
+                System.out.println("ID commento: " + idCommento);
+                int idCommentoPadre = commentoDao.getParentCommentId(idCommento);
+                System.out.println("Commento padre: " + idCommentoPadre);
+
+                if (idCommentoPadre != -1) {
+                    System.out.println("Commento padre trovato");
+                    System.out.println("ID commento padre: " + idCommentoPadre);
+                    String testoCommentoPadre = commentoDao.getCommentTextById(idCommentoPadre);
+                    JLabel parentLabel = new JLabel(commento.getUsername() + ": In risposta a ");
+                    JLabel italicLabel = new JLabel(testoCommentoPadre);
+                    italicLabel.setFont(italicLabel.getFont().deriveFont(Font.ITALIC));
+                    JLabel messageLabel = new JLabel(": " + commento.getTesto());
+
+                    messagePanel.add(parentLabel);
+                    messagePanel.add(italicLabel);
+                    messagePanel.add(messageLabel);
+                    
+                } else {
+                    System.out.println("Commento padre non trovato");
+                    System.out.println("ID commento padre: " + idCommentoPadre);
+                    // System.out.println("ID commento padre: " + commento.getIdCommentoPadre());
+                    JLabel messageLabel = new JLabel(commento.getUsername() + ": " + commento.getTesto());
+                    messagePanel.add(messageLabel);
+                }
     
+
                 // Crea un pulsante "Rispondi" per ogni commento
                 JButton replyButton = new JButton("Rispondi");
                 replyButton.addActionListener(new ActionListener() {
@@ -187,7 +211,7 @@ public class ContentViewer {
                 if (!message.isEmpty()) {
                     // Crea un nuovo commento con l'eventuale commento padre
                     Timestamp data = new Timestamp(System.currentTimeMillis());
-                    Integer idCommentoPadre = (selectedCommentoPadre[0] != null) ? selectedCommentoPadre[0].getIdCommento() : null;
+                    Integer idCommentoPadre = (selectedCommentoPadre[0] != null) ? selectedCommentoPadre[0].getIdCommento() : -1;
                     Commento commento = new Commento(0, message, data, idContenuto, currentUser.getUsername(), idCommentoPadre);
     
                     try (Connection connection = DatabaseConnection.getConnection()) {
@@ -201,13 +225,16 @@ public class ContentViewer {
     
                         // Se c'è un messaggio padre, visualizzalo
                         if (selectedCommentoPadre[0] != null) {
-                            JLabel parentMessageLabel = new JLabel("In risposta a " + ": " + selectedCommentoPadre[0].getTesto() + " ");
+                            System.out.println("In risposta a: " + selectedCommentoPadre[0].getTesto());
+                            JLabel parentLabel = new JLabel(commento.getUsername() + ": In risposta a ");
+                            JLabel parentMessageLabel = new JLabel(selectedCommentoPadre[0].getTesto() + "    ");
                             parentMessageLabel.setFont(parentMessageLabel.getFont().deriveFont(Font.ITALIC)); // Opzionale: stile in corsivo
+                            newMessagePanel.add(parentLabel);
                             newMessagePanel.add(parentMessageLabel);
                         }
     
                         // Messaggio dell'utente corrente
-                        JLabel newMessageLabel = new JLabel(commento.getUsername() + ": " + message);
+                        JLabel newMessageLabel = new JLabel(message);
                         newMessagePanel.add(newMessageLabel);
     
                         // Pulsante "Rispondi" per il nuovo messaggio
@@ -215,7 +242,7 @@ public class ContentViewer {
                         newReplyButton.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                inputArea.setText("@" + currentUser.getUsername() + " ");
+                                // inputArea.setText("@" + currentUser.getUsername() + " ");
                                 selectedCommentoPadre[0] = commento;
                             }
                         });
